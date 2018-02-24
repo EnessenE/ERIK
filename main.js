@@ -5,20 +5,20 @@ function timeout(delay) {
 }
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const token = ""
+const token = "examplekey"
 
 const ytdl = require('ytdl-core');
 const OS = require('os');
 var fs = require('fs');
 
 const imdb = require('imdb-api');
-imdbkey = "b50bea60";
+imdbkey = "examplekey";
 
 var YouTube = require('youtube-node');
 var youTube = new YouTube();
-youTube.setKey('');
+youTube.setKey("examplekey");
 
-var giphy = require('giphy-api')("");
+var giphy = require('giphy-api')("examplekey");
 
 
 maxyoutubevideotime = 3600; //seconds
