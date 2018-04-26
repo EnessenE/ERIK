@@ -41,6 +41,12 @@ var votes = new Array();
 var skipsong = new Array();
 var skiplist = new Array();
 
+//inits//
+
+configcommands.init(sql, config);
+infocommands.init(sql, config, OS);
+
+//end inits//
 var commands = [
     "help", "List of commands.",
     "prefix [new prefix]", "Set a new prefix for the bot.",
@@ -61,47 +67,38 @@ var commands = [
 
 console.log(OS.hostname());
 client.login(token);
-
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    console.log(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
-    client.fetchUser("124928188647211009")
-        .then((User) => {
-            User.send("I have been started on "+OS.hostname()+" - "+botver);
-
-        })
-        .catch((err) => {
-            console.log("Error with finding a user: " + err);
-     })
+    await sendtoadmin("I have been started on: " + OS.hostname() + " - " + botver);
+    await sendtoadmin(`Ready to serve on ${client.guilds.size} servers, for ${client.users.size} users.`);
     client.user.setActivity(statusbot);
-}); 
+});
 
 client.on('guildCreate', async guild => {
-    console.log(`Added to a discord! ` + guild.name + " - " + (guild.memberCount-1) + " members");
-    client.fetchUser("124928188647211009")
-        .then((User) => {
-            User.send(`Added to a discord! ` + guild.name + " - " + (guild.memberCount-1) + " members");
-
-        })
-        .catch((err) => {
-            console.log("Error with finding a user: "+err);
-        })
-    if (guild.region == ("sydney" || "hongkong")) {
-        guild.owner.user.send("Hi, I am " + client.user.username + ". \nI am sending this message because I got added to your discord called **" + guild.name + "**. Shamefully I have detected your server is in the region " + guild.region + ". This may cause performance issues with the /play command. If you think this message is incorrect/annoying/lovely please message @Enes#0618.");
-    }
-}); 
+    sendtoadmin(`Added to a discord: ` + guild.name + " - " + (guild.memberCount - 1) + " members");
+});
 
 client.on('guildDelete', async guild => {
-    console.log(`Removed from a discord! ` + guild.name + " - " + (guild.memberCount) + " members");
-    client.fetchUser("124928188647211009")
-        .then((User) => {
-            User.send(`Removed from a discord ` + guild.name + " - " + (guild.memberCount)  + " members");
+    sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
+});
 
-        })
-        .catch((err) => {
-            console.log("Error with finding a user: " + err);
-        })
-}); 
+function getadminuser() {
+    return new Promise(async function (resolve, reject) {
+        console.log("getting admin user.")
+        resolve(await client.fetchUser(config.adminuser));
+    })
+}
+
+var admin;
+async function sendtoadmin(message) {
+    console.log(message);
+    if (admin == undefined) {
+        console.log("Getting admin user");
+        admin = await getadminuser();
+    }
+    console.log("Sending message: " + message.toString());
+    admin.send(message.toString());
+}
 
 function TryParseInt(str, defaultValue) {
     var retValue = defaultValue;
