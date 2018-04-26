@@ -7,9 +7,6 @@ function timeout(delay) {
 const config = require("./config.json");
 const sql = require("./sql.js");
 
-const configcommands = require("./Commands/configuration.js");
-const infocommands = require("./Commands/info.js");
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const token = config.discordtoken;
@@ -27,14 +24,15 @@ youTube.setKey(config.youtubetoken);
 
 var giphy = require('giphy-api')(config.giphytoken);
 
+
 var maxyoutubevideotime = config.maxyoutubevideotimedefault; //seconds
 
 var defaultprefix = config.defaultprefix;
 var discordbotlink = config.discordbotlink;
 var botver = config.botver;
 var statusbot = botver + " | " + "/" + "help";
-var versioninfo = config.versioninfo;
-
+versioninfo = config.versioninfo;
+    
 var playlist = new Array();
 var playing = new Array();
 var votes = new Array();
