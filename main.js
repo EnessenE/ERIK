@@ -179,57 +179,13 @@ client.on('message', async message => {
                 }
                 else if (input === prefix + "serverinfo") {
                     // console.log(message.guild.roles);
-                    roleoutput = "";
-                    message.guild.roles.forEach(function (element) {
-                        roleoutput = roleoutput + ", " + element.name;
-                    });
-                    roleoutput = roleoutput.substr(3, roleoutput.length);
-                    message.reply({
-                        embed: {
-                            color: 3447003,
-                            author: {
-                                name: "Server information for " + message.guild.name,
-                                icon_url: message.guild.iconURL
-                            },
-                            fields: [{
-                                name: "Generic",
-                                value: "**ID:** " + message.guild.id + "\n"
-                                + "**Members:** " + message.guild.memberCount + "\n"
-                                + "**Owner:** " + message.guild.owner.user.tag + " - " + message.guild.ownerID + "\n"
-                                + "**Region:** " + message.guild.region + "\n"
-                                + "**Created at:** " + message.guild.createdAt + "\n"
-                                + "**Verification level:** " + message.guild.verificationLevel + "\n"
-                                + "**AFK timeout:** " + message.guild.afkTimeout / 60 + " minute(s)\n"
-                                + "**Icon:** " + message.guild.iconURL + "\n"
-                            },
-                            {
-                                name: "Roles",
-                                value: roleoutput
-                            },
-                            {
-                                name: "Statistics",
-                                value: "Played songs: " + await sql.getvalue(message.guild.id, "played") + "\n" +
-                                "Skipped songs: " + await sql.getvalue(message.guild.id, "skipped") + "\n"
-                            },
-                            {
-                                name: "ERIK Configuration",
-                                value: "**Maximal playtime:** " + await sql.getplaytime(message.guild.id) + " seconds \n" +
-                                "**Prefix:** "+prefix + "\n"
-                            },
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                icon_url: client.user.avatarURL,
-                                text: discordbotlink
-                            }
-                        }
-                    });
+                    infocommands.serverinfo(client, message);
                 }
                 else if (input === prefix + "help") {
                     helparray = "";
                     var list = 0
                     for (i = 0; i < commands.length / 2; i++) {
-                        helparray = helparray+  "**" +prefix+ commands[list] + "** - " + commands[list + 1] + "\n";
+                        helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
                         list += 2;
                     }
                     messagearray = {
@@ -398,9 +354,9 @@ client.on('message', async message => {
                                     {
                                         name: playlist[message.guild.id][i].vidname,
                                         value: "Added by: " + playlist[message.guild.id][i].author + "\n" +
-                                        "Channel: " + playlist[message.guild.id][i].channel + "\n" +
-                                        "Length: " + playlist[message.guild.id][i].time + "\n" +
-                                        "Link: " + playlist[message.guild.id][i].link + "\n"
+                                            "Channel: " + playlist[message.guild.id][i].channel + "\n" +
+                                            "Length: " + playlist[message.guild.id][i].time + "\n" +
+                                            "Link: " + playlist[message.guild.id][i].link + "\n"
                                     }
                                 )
                             }
@@ -408,9 +364,9 @@ client.on('message', async message => {
                                 messagearray.embed.fields.push({
                                     name: "Currently playing: " + playlist[message.guild.id][i].vidname,
                                     value: "Added by: " + playlist[message.guild.id][i].author + "\n" +
-                                    "Channel: " + playlist[message.guild.id][i].channel + "\n" +
-                                    "Length: " + playlist[message.guild.id][i].time + "\n" +
-                                    "Link: " + playlist[message.guild.id][i].link + "\n"
+                                        "Channel: " + playlist[message.guild.id][i].channel + "\n" +
+                                        "Length: " + playlist[message.guild.id][i].time + "\n" +
+                                        "Link: " + playlist[message.guild.id][i].link + "\n"
                                 })
                             }
                         }
@@ -439,14 +395,14 @@ client.on('message', async message => {
                                     fields: [{
                                         name: "Generic",
                                         value: "Title: " + data.title +
-                                        "\n" + "Sort: " + data.type +
-                                        "\n" + "Release date: " + data.released +
-                                        "\n" + "Runtime: " + data.runtime +
-                                        "\n" + "Orgin country: " + data.country +
-                                        "\n" + "DVD release: " + data.dvd +
-                                        "\n" + "Box office: " + data.boxoffice +
-                                        "\n" + "Production company: " + data.production +
-                                        "\n" + "Awards: " + data.awards
+                                            "\n" + "Sort: " + data.type +
+                                            "\n" + "Release date: " + data.released +
+                                            "\n" + "Runtime: " + data.runtime +
+                                            "\n" + "Orgin country: " + data.country +
+                                            "\n" + "DVD release: " + data.dvd +
+                                            "\n" + "Box office: " + data.boxoffice +
+                                            "\n" + "Production company: " + data.production +
+                                            "\n" + "Awards: " + data.awards
                                     },
                                     {
                                         name: "Movie plot: ",
@@ -455,13 +411,13 @@ client.on('message', async message => {
                                     {
                                         name: "Cast:",
                                         value: "Writer(s): " + data.writer +
-                                        "\n" + "Actor(s): " + data.actors
+                                            "\n" + "Actor(s): " + data.actors
                                     },
                                     {
                                         name: "IMDB Score:",
                                         value: "Total rating: " + data.rating +
-                                        "\n" + "Votes: " + data.votes +
-                                        "\n" + "Metascore: " + data.metascore + "/100"
+                                            "\n" + "Votes: " + data.votes +
+                                            "\n" + "Metascore: " + data.metascore + "/100"
                                     },
                                     ],
                                     timestamp: new Date(),
@@ -528,8 +484,9 @@ client.on('message', async message => {
                 else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
                     infocommands.userinfo(client, message);
                 }
-            else {
-                console.log("Not allowed to chat here.");
+                else {
+                    console.log("Not allowed to chat here.");
+                }
             }
         }
         catch (erro) {

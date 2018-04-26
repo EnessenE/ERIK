@@ -13,6 +13,53 @@ module.exports = {
         message.reply('My ping to discord is ' + client.ping + ' ms.');
     },
 
+    serverinfo: async function (client, message) {
+        roleoutput = "";
+        message.guild.roles.forEach(function (element) {
+            roleoutput = roleoutput + ", " + element.name;
+        });
+        roleoutput = roleoutput.substr(3, roleoutput.length);
+        message.reply({
+            embed: {
+                color: 3447003,
+                author: {
+                    name: "Server information for " + message.guild.name,
+                    icon_url: message.guild.iconURL
+                },
+                fields: [{
+                    name: "Generic",
+                    value: "**ID:** " + message.guild.id + "\n"
+                        + "**Members:** " + message.guild.memberCount + "\n"
+                        + "**Owner:** " + message.guild.owner.user.tag + " - " + message.guild.ownerID + "\n"
+                        + "**Region:** " + message.guild.region + "\n"
+                        + "**Created at:** " + message.guild.createdAt + "\n"
+                        + "**Verification level:** " + message.guild.verificationLevel + "\n"
+                        + "**AFK timeout:** " + message.guild.afkTimeout / 60 + " minute(s)\n"
+                        + "**Icon:** " + message.guild.iconURL + "\n"
+                },
+                {
+                    name: "Roles",
+                    value: roleoutput
+                },
+                {
+                    name: "Statistics",
+                    value: "Played songs: " + await sql.getvalue(message.guild.id, "played") + "\n" +
+                        "Skipped songs: " + await sql.getvalue(message.guild.id, "skipped") + "\n"
+                },
+                {
+                    name: "ERIK Configuration",
+                    value: "**Maximal playtime:** " + await sql.getplaytime(message.guild.id) + " seconds \n" +
+                        "**Prefix:** " + prefix + "\n"
+                },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    icon_url: client.user.avatarURL,
+                    text: discordbotlink
+                }
+            }
+        });
+    },
     botinfo: async function (client, message) {
         message.reply({
             embed: {
