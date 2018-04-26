@@ -47,6 +47,7 @@ configcommands.init(sql, config);
 infocommands.init(sql, config, OS);
 
 //end inits//
+
 var commands = [
     "help", "List of commands.",
     "prefix [new prefix]", "Set a new prefix for the bot.",
@@ -67,6 +68,7 @@ var commands = [
 
 console.log(OS.hostname());
 client.login(token);
+
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     await sendtoadmin("I have been started on: " + OS.hostname() + " - " + botver);
@@ -169,52 +171,11 @@ client.on('message', async message => {
                 if (input === prefix + "ping") {
                     message.reply('My ping to discord is ' + client.ping + ' ms.');
                 }
-                else if (input === prefix + "you") {
-                    message.reply({
-                        embed: {
-                            color: 3447003,
-                            author: {
-                                name: "Bot information for " + client.user.tag,
-                                icon_url: client.user.avatarURL
-                            },
-                            fields: [{
-                                name: "Generic",
-                                value:
-                                "Uptime: " + Math.floor(((client.uptime / 1000.0) / 60 / 60), 1) + " hour(s)\n"
-                                + "Running on: " + client.guilds.size + " servers\n"
-                                + "Running for: " + client.users.size + " online users\n"
-                            },
-                            {
-                                name: "Version " + botver,
-                                value: versioninfo
-                            },
-                            {
-                                name: "Back-end info",
-                                value:
-                                "Current server: " + OS.hostname() + "\n"
-                                + "RAM: " + Math.floor((OS.freemem() / 1073741824) * 10) / 10 + "/" + Math.floor((OS.totalmem() / 1073741824) * 10) / 10 + " GB \n"
-                                + "CPU: " + OS.cpus().length + " cores \n"
-                            }
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                icon_url: client.user.avatarURL,
-                                text: discordbotlink
-                            }
-                        }
-                    });
+                else if (input === prefix + "you" || input === prefix + "botinfo") {
+                    infocommands.botinfo(client, message);
                 }
                 else if (input === prefix + "prefix") {
-                    if (await PermCheck(message, message.author, gotroleid) == true) {
-                        if (parameters.length != 0) {
-                            //prefixset[message.guild.id] = parameters[0];
-                            sql.setprefix(message.guild.id, parameters[0])
-                            message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
-                        }
-                    }
-                    else {
-                        notallowed("prefix", message.guild.id)
-                    }
+                    configcommands.setprefix(client, message, parameters);
                 }
                 else if (input === prefix + "serverinfo") {
                     // console.log(message.guild.roles);
@@ -562,131 +523,11 @@ client.on('message', async message => {
                     message.reply(message.author.id);
                 }
                 else if (input === prefix + "botcontrol") {
-                    if (message.member.hasPermission("ADMINISTRATOR")) {
-                        if (parameters[0] != ("" || undefined)) {
-                            bigpara = "";
-                            for (var i = 0; i < parameters.length; i++) {
-                                bigpara = bigpara + " " + parameters[i]
-                            }
-                            bigpara = bigpara.substr(1, bigpara.length);
-                            var found = false;
-                            var roleid = 0;
-                            var rolename = "";
-                            message.guild.roles.forEach(function (element) {
-                                if (element.name == bigpara) {
-                                    found = true;
-                                    roleid = element.id;
-                                    rolename = element.name;
-                                }
-                            });
-                            if (found == true) {
-                                sql.updatevalue(message.guild.id, "PermRole", roleid)
-                                message.reply("I have set the role " + rolename + " to control me.");
-                            }
-                            else {
-                                message.reply("I couldn't find that role");
-                            }
-                        }
-                        else {
-                            roleid = 0;
-                            rolename = "";
-                            message.guild.roles.forEach(function (element) {
-                                if (element.id == gotroleid) {
-                                    found = true;
-                                    roleid = element.id;
-                                    rolename = element.name;
-                                }
-                            });
-                            if (roleid != 0) {
-                                message.reply("The role that can control me is " + rolename+".");
-                            }
-                            else {
-                                message.reply("No role has been set to control me.");
-                            }
-                        }
-                    }
-                    else {
-                        message.reply("Sorry, you need the Administrator permission to change this.");
-                    }
+                    configcommands.setbotcontrol(message)
                 }
-                else if (input === prefix + "userinfo") {
-                    auser = message.author.id;
-                    if (parameters[0] != (undefined)) {
-                        dothis = parameters[0];
-                        dothis = dothis.replace("<@!", "");
-                        dothis = dothis.replace("<@", "");
-                        auser = dothis.replace(">", "");
-                    }
-                    gotuser = await client.fetchUser(auser);
-                    gotmember = await message.guild.fetchMember(gotuser);
-                    try {
-                        presencetable = {};
-                        if (gotuser.presence.game == undefined) {
-                            presencetable = {
-                                name: "Status",
-                                value: "\n" + "**Presence:** " + gotuser.presence.status
-                            };
-                        }
-                        else if (gotuser.presence.game.streaming == false) {
-                            presencetable = {
-                                name: "Status",
-                                value: "\n" + "**Presence:** " + gotuser.presence.status +
-                                "\n" + "**Current game:** " + gotuser.presence.game.name
-                            };
-                        }
-                        else {
-                            presencetable = {
-                                name: "Status",
-                                value: "\n" + "**Presence:** " + gotuser.presence.status +
-                                "\n" + "**Current game:** " + gotuser.presence.game.name +
-                                "\n" + "**Streaming:** " + gotuser.presence.game.streaming + " - " + gotuser.presence.game.url +
-                                "\n" + "**Game type:** " + gotuser.presence.game.type
-                            };
-                        }
-                        roleoutput = "";
-                        gotmember.roles.forEach(function (element) {
-                            roleoutput = roleoutput + ", " + element.name;
-                        });
-                        roleoutput = roleoutput.substr(3, roleoutput.length);
-                        messagearray = {
-                            embed: {
-                                color: 3066993,
-                                author: {
-                                    name: "User information for " + gotuser.username,
-                                    icon_url: gotuser.avatarURL
-                                },
-                                fields: [{
-                                        name: "Generic",
-                                        value: "**Bot**: " + gotuser.bot +
-                                        "\n" + "**Tag**: " + gotuser.tag +
-                                        "\n" + "**User ID**: " + gotuser.id +
-                                        "\n" + "**Joined discord on**: " + gotuser.createdAt 
-                                    },
-                                    {
-                                        name: "Guild specific info",
-                                        value: "**Nickname**: " + (gotmember.nickname || "None")  + "\n" +
-                                        "**Joined this guild on**: " + gotmember.joinedAt + "\n" +
-                                        "**Strongest role**: " + gotmember.highestRole.name + "\n" +
-                                        "**Server muted**: " + gotmember.serverMute + "\n" + 
-                                        "**Roles**: " + roleoutput
-                                    },
-
-                                    presencetable
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    icon_url: client.user.avatarURL,
-                                    text: discordbotlink
-                                }
-                            }
-                        };
-                        message.reply(messagearray);
-                    }
-                    catch (err) {
-                        message.reply("Couldn't make an embedded post for you. Sorry!");
-                    }
+                else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
+                    infocommands.userinfo(client, message);
                 }
-            }
             else {
                 console.log("Not allowed to chat here.");
             }
