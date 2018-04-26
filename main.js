@@ -16,7 +16,7 @@ const OS = require('os');
 var fs = require('fs');
 
 const imdb = require('imdb-api');
-imdbkey = "examplekey";
+imdbkey = config.imdbtoken;
 
 var YouTube = require('youtube-node');
 var youTube = new YouTube();
