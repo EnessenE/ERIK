@@ -3,13 +3,9 @@ function timeout(delay) {
         setTimeout(resolve, delay);
     });
 }
-
-const config = require("./config.json");
-const sql = require("./sql.js");
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const token = config.discordtoken;
+const token = "examplekey"
 
 const ytdl = require('ytdl-core');
 const OS = require('os');
@@ -20,18 +16,19 @@ imdbkey = "examplekey";
 
 var YouTube = require('youtube-node');
 var youTube = new YouTube();
-youTube.setKey(config.youtubetoken);
+youTube.setKey("examplekey");
 
-var giphy = require('giphy-api')(config.giphytoken);
+var giphy = require('giphy-api')("examplekey");
 
 
-var maxyoutubevideotime = config.maxyoutubevideotimedefault; //seconds
+maxyoutubevideotime = 3600; //seconds
 
-var defaultprefix = config.defaultprefix;
-var discordbotlink = config.discordbotlink;
-var botver = config.botver;
-var statusbot = botver + " | " + "/" + "help";
-versioninfo = config.versioninfo;
+var defaultprefix = "/";
+var discordbotlink = "reasulus.nl";
+var statusbot = "V0.75! | " + "/" + "help"; //discordbotlink+" | " + "/" + "help";
+var botver= "v0.75 - 24/02/2018";
+versioninfo = "Fixed issue with /play not recognized people in a voicechannel\n" +
+    "Fixed issue related to /play instantly stopping(freaking api)\n Fixed misc issues.";
     
 var playlist = new Array();
 var playing = new Array();
@@ -59,6 +56,8 @@ var commands = [
 
 console.log(OS.hostname());
 client.login(token);
+
+const sql = require("./sql.js");
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
