@@ -9,6 +9,7 @@
     "discord.js": "^11.3.0",
     "ffmpeg-binaries": "^3.2.2",
     "giphy-api": "^1.2.7",
+    "hoek": "^5.0.3",
     "imdb-api": "^3.1.2",
     "mssql": "^4.1.0",
     "mysql": "^2.15.0",
