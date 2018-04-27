@@ -9,6 +9,7 @@ const sql = require("./sql.js");
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/info.js");
+const imdbcommands = require("./Commands/IMDB.js");
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -17,9 +18,6 @@ const token = config.discordtoken;
 const ytdl = require('ytdl-core');
 const OS = require('os');
 var fs = require('fs');
-
-const imdb = require('imdb-api');
-imdbkey = config.imdbtoken;
 
 var YouTube = require('youtube-node');
 var youTube = new YouTube();
@@ -45,6 +43,7 @@ var skiplist = new Array();
 
 configcommands.init(sql, config);
 infocommands.init(sql, config, OS);
+imdbcommands.init(config);
 
 //end inits//
 
@@ -169,7 +168,7 @@ client.on('message', async message => {
                     console.log("Created a new queue for " + message.guild.id)
                 }
                 if (input === prefix + "ping") {
-                    message.reply('My ping to discord is ' + client.ping + ' ms.');
+                    infocommands.ping(client, message);
                 }
                 else if (input === prefix + "you" || input === prefix + "botinfo") {
                     infocommands.botinfo(client, message);
@@ -182,44 +181,7 @@ client.on('message', async message => {
                     infocommands.serverinfo(client, message);
                 }
                 else if (input === prefix + "help") {
-                    helparray = "";
-                    var list = 0
-                    for (i = 0; i < commands.length / 2; i++) {
-                        helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
-                        list += 2;
-                    }
-                    messagearray = {
-                        embed: {
-                            color: 3066993,
-                            author: {
-                                name: "Commands for " + message.guild.name,
-                                icon_url: message.guild.iconURL
-                            },
-                            fields: [
-                                {
-                                    name: "Help",
-                                    value: helparray
-                                }
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                icon_url: client.user.avatarURL,
-                                text: discordbotlink
-                            }
-                        }
-                    };
-                    //var list = 0
-                    //for (i = 0; i < commands.length / 2; i++) {
-                    //    messagearray.embed.fields.push(
-                    //        {
-                    //            name: prefix + commands[list],
-                    //            // inline: true,
-                    //            value: commands[list + 1]
-                    //        }
-                    //    )
-                    //    list += 2;
-                    //}
-                    message.reply(messagearray);
+                    infocommands.helpinfo(client, message, helpinfo);
                 }
                 else if (input === prefix + "play") {
                     const voiceChannel = await message.member.voiceChannel;
@@ -373,71 +335,8 @@ client.on('message', async message => {
                         message.reply(messagearray);
                     }
                 }
-                else if (input === prefix + "avatar") {
-                    message.reply(message.author.avatarURL);
-                }
                 else if (input === prefix + "imdb") {
-                    bigpara = "";
-                    for (var i = 0; i < parameters.length; i++) {
-                        bigpara = bigpara + " " + parameters[i]
-
-                    }
-                    console.log("ABOUT TO SEARCH: " + bigpara);
-                    imdb.get(bigpara, { apiKey: imdbkey, timeout: 30000 }).then(function (data) {
-                        if (data != undefined) {
-                            messagearray = {
-                                embed: {
-                                    color: 3066993,
-                                    author: {
-                                        name: "Movie information for " + data.title,
-                                        icon_url: data.poster,
-                                    },
-                                    fields: [{
-                                        name: "Generic",
-                                        value: "Title: " + data.title +
-                                            "\n" + "Sort: " + data.type +
-                                            "\n" + "Release date: " + data.released +
-                                            "\n" + "Runtime: " + data.runtime +
-                                            "\n" + "Orgin country: " + data.country +
-                                            "\n" + "DVD release: " + data.dvd +
-                                            "\n" + "Box office: " + data.boxoffice +
-                                            "\n" + "Production company: " + data.production +
-                                            "\n" + "Awards: " + data.awards
-                                    },
-                                    {
-                                        name: "Movie plot: ",
-                                        value: data.plot
-                                    },
-                                    {
-                                        name: "Cast:",
-                                        value: "Writer(s): " + data.writer +
-                                            "\n" + "Actor(s): " + data.actors
-                                    },
-                                    {
-                                        name: "IMDB Score:",
-                                        value: "Total rating: " + data.rating +
-                                            "\n" + "Votes: " + data.votes +
-                                            "\n" + "Metascore: " + data.metascore + "/100"
-                                    },
-                                    ],
-                                    timestamp: new Date(),
-                                    footer: {
-                                        icon_url: client.user.avatarURL,
-                                        text: discordbotlink
-                                    }
-                                }
-                            };
-                            message.reply(messagearray);
-                        }
-                        else {
-                            message.reply("I couldn't find your movie on IMDB.")
-                        }
-                    }).catch(function (data) {
-                        console.log(data);
-                        message.reply("Something went wrong while searching your movie on the IMDB api.")
-                    });
-
-
+                    imdbcommands.search() herer
                 }
                 else if (input === prefix + "giphy") {
                     bigpara = "";

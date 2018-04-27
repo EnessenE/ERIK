@@ -13,6 +13,51 @@ module.exports = {
         message.reply('My ping to discord is ' + client.ping + ' ms.');
     },
 
+    helpinfo: async function (client, message, helpinfo) {
+        helparray = "";
+        var list = 0
+        for (i = 0; i < commands.length / 2; i++) {
+            helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
+            list += 2;
+        }
+        messagearray = {
+            embed: {
+                color: 3066993,
+                author: {
+                    name: "Commands for " + message.guild.name,
+                    icon_url: message.guild.iconURL
+                },
+                fields: [
+                    {
+                        name: "Help",
+                        value: helparray
+                    }
+                ],
+                timestamp: new Date(),
+                footer: {
+                    icon_url: client.user.avatarURL,
+                    text: discordbotlink
+                }
+            }
+        };
+        //var list = 0
+        //for (i = 0; i < commands.length / 2; i++) {
+        //    messagearray.embed.fields.push(
+        //        {
+        //            name: prefix + commands[list],
+        //            // inline: true,
+        //            value: commands[list + 1]
+        //        }
+        //    )
+        //    list += 2;
+        //}
+        message.reply(messagearray);
+    },
+
+    ping: async function (client, message) {
+        message.reply('My ping to discord is ' + client.ping + ' ms.');
+    },
+
     serverinfo: async function (client, message) {
         roleoutput = "";
         message.guild.roles.forEach(function (element) {
