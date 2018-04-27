@@ -6,7 +6,7 @@
   "dependencies": {
     "ajax-request": "^1.2.3",
     "cleverbot.io": "^1.0.4",
-    "discord.js": "^11.3.0",
+    "discord.js": "^11.3.2",
     "ffmpeg-binaries": "^3.2.2",
     "giphy-api": "^1.2.7",
     "hoek": "^5.0.3",
