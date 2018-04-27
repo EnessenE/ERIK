@@ -18,7 +18,7 @@ connection.connect(function (err) {
 async function checkexist(id, fn) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = false;
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -29,13 +29,10 @@ async function checkexist(id, fn) {
     });
 }
 
-async function createserver(id,servername,members,prefix,owner,region) {
+async function createserver(id, servername, members, prefix, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        servername = servername.replace("'", "''");
-        owner = owner.replace("'", "''");
-        region = region.replace("'", "''");
-        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES ('" + id.toString() + "', '" + servername + "', '" + members.toString() + "', '" + prefix + "', '" + owner + "', '"+region+"');", async function ExistCheck(err, result) {
+        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(connection.escape(servername)) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region) + ");", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -45,15 +42,13 @@ async function createserver(id,servername,members,prefix,owner,region) {
     });
 }
 
+
 //UPDATE `database`.`servers` SET `servername`='34', `members`='60', `prefix`='34', `owner`='34', `region`='34' WHERE `serverid`='250621419325489153';
 
 function updateall(id, servername, members, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        servername = servername.replace("'", "''");
-        owner = owner.replace("'", "''");
-        region = region.replace("'", "''");
-        connection.query("UPDATE `servers` SET `servername`='" + servername + "', `members`='" + members.toString() + "', `owner`='" + owner + "', `region`='" + region + "' WHERE `serverid`='" + id.toString() + "';", async function ExistCheck(err, result) {
+        connection.query("UPDATE `servers` SET `servername`=" + mysql.escape(servername) + ", `members`=" + mysql.escape(members.toString()) + ", `owner`=" + mysql.escape(owner) + ", `region`=" + mysql.escape(region) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -66,13 +61,18 @@ function updateall(id, servername, members, owner, region) {
 function update(id, toset, newval) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("UPDATE `servers` SET `"+toset+"`='" + newval  + "' WHERE `serverid`='" + id.toString() + "';", async function ExistCheck(err, result) {
-            if (err) {
-                console.log(err);
-                resolve("Couldn't create record!");
-            }
-            resolve("Successfully changed");
-        });
+        try {
+            connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+                if (err) {
+                    console.log(err);
+                    resolve("Couldn't create record!");
+                }
+                resolve(true);
+            });
+        }
+        catch (err) {
+            resolve(false);
+        }
     });
 }
 
@@ -80,7 +80,7 @@ function update(id, toset, newval) {
 function checkprefix(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -91,10 +91,11 @@ function checkprefix(id) {
     });
 }
 
+
 function checkplaytime(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
@@ -106,10 +107,10 @@ function checkplaytime(id) {
 }
 
 
-function checkvalue(id,valuetocheck) {
+function checkvalue(id, valuetocheck) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + id.toString() + "", async function ExistCheck(err, result, fields) {
+        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
             result.forEach(function (e, err) {
