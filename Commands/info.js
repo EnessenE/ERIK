@@ -13,33 +13,41 @@ module.exports = {
         message.reply('My ping to discord is ' + client.ping + ' ms.');
     },
 
-    helpinfo: async function (client, message, helpinfo) {
-        helparray = "";
+    help: async function (client, message, commands) {
+        var helparray = "";
         var list = 0
         for (i = 0; i < commands.length / 2; i++) {
             helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
             list += 2;
         }
-        messagearray = {
-            embed: {
-                color: 3066993,
-                author: {
-                    name: "Commands for " + message.guild.name,
-                    icon_url: message.guild.iconURL
-                },
-                fields: [
-                    {
-                        name: "Help",
-                        value: helparray
+        try {
+            messagearray = {
+                embed: {
+                    color: 3066993,
+                    author: {
+                        name: "Commands for " + message.guild.name,
+                        icon_url: message.guild.iconURL
+                    },
+                    fields: [
+                        {
+                            name: "Help",
+                            value: helparray
+                        }
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        icon_url: client.user.avatarURL,
+                        text: config.discordbotlink
                     }
-                ],
-                timestamp: new Date(),
-                footer: {
-                    icon_url: client.user.avatarURL,
-                    text: discordbotlink
                 }
-            }
-        };
+            };
+            message.reply(messagearray);
+
+        }
+        catch (err) {
+            console.Log(err);
+            message.reply("```"+helparray+"```");
+        }
         //var list = 0
         //for (i = 0; i < commands.length / 2; i++) {
         //    messagearray.embed.fields.push(
@@ -51,7 +59,6 @@ module.exports = {
         //    )
         //    list += 2;
         //}
-        message.reply(messagearray);
     },
 
     ping: async function (client, message) {
@@ -100,7 +107,7 @@ module.exports = {
                 timestamp: new Date(),
                 footer: {
                     icon_url: client.user.avatarURL,
-                    text: discordbotlink
+                    text: config.discordbotlink
                 }
             }
         });

@@ -12,6 +12,7 @@ var skiplist = new Array();
 
 var sql;
 var config;
+var client;
 
 function TryParseInt(str, defaultValue) {
     var retValue = defaultValue;
@@ -42,14 +43,15 @@ function PermCheck(message, user, roleid) {
 }
 
 module.exports = {
-    init: function (s, c) {
+    init: function (s, c,cl) {
         sql = s;
         config = c;
+        client = cl;
         youTube.setKey(config.youtubetoken);
         maxyoutubevideotime = config.maxyoutubevideotimedefault;
     },
 
-    play: async function (client, message) {
+    play: async function (client, message, parameters,permmember) {
         const voiceChannel = await message.member.voiceChannel;
         if (!voiceChannel) return message.reply("Please be in a voice channel first!");
         if (permmember.has("CONNECT") != true) return message.reply("Sorry, I can't connect to your voicechannel. I have insufficient permissions.");
@@ -145,7 +147,7 @@ module.exports = {
                     timestamp: new Date(),
                     footer: {
                         icon_url: client.user.avatarURL,
-                        text: discordbotlink
+                        text: config.discordbotlink
                     }
                 }
             };
@@ -164,7 +166,7 @@ module.exports = {
                     timestamp: new Date(),
                     footer: {
                         icon_url: client.user.avatarURL,
-                        text: discordbotlink
+                        text: config.discordbotlink
                     }
                 }
             };
@@ -230,6 +232,16 @@ module.exports = {
             message.reply(notallowed("stop", message.guild.id));
         }
     },
+
+    playlistcheck: async function (client, message) {
+        if (playlist[message.guild.id] == undefined) {
+            playlist[message.guild.id] = new Array();
+            skiplist[message.guild.id] = new Array();
+            votes[message.guild.id] = 0;
+            skipsong[message.guild.id] = false;
+            console.log("Created a new queue for " + message.guild.id)
+        }
+    }
 }
 
 
@@ -307,7 +319,7 @@ async function play(message, para, voiceChannel, guildid) {
                             timestamp: new Date(),
                             footer: {
                                 icon_url: client.user.avatarURL,
-                                text: discordbotlink
+                                text: config.discordbotlink
                             }
                         }
                     };
@@ -319,7 +331,7 @@ async function play(message, para, voiceChannel, guildid) {
             dispatcher.on('end', async function (error, result) {
                 console.log("Ended song! Skip status: " + getskipstatus(guildid));
                 if (getskipstatus(guildid) === false) {
-                    killsong(guildid);
+                    await killsong(guildid);
                     skipsong[guildid] = false;
                 }
                 else {

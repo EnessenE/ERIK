@@ -56,7 +56,7 @@ module.exports = {
                         timestamp: new Date(),
                         footer: {
                             icon_url: client.user.avatarURL,
-                            text: discordbotlink
+                            text: config.discordbotlink
                         }
                     }
                 };

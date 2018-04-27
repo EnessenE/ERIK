@@ -22,7 +22,6 @@ const OS = require('os');
 var fs = require('fs');
 
 var defaultprefix = config.defaultprefix;
-var discordbotlink = config.discordbotlink;
 var botver = config.botver;
 var statusbot = botver + " | " + "/" + "help";
 var versioninfo = config.versioninfo;
@@ -32,7 +31,7 @@ var versioninfo = config.versioninfo;
 configcommands.init(sql, config);
 infocommands.init(sql, config, OS);
 imdbcommands.init(config);
-musiccommands.init(sql, config);
+musiccommands.init(sql, config,client);
 giphycommands.init(config);
 //end inits//
 
@@ -113,7 +112,7 @@ function PermCheck(message, user, roleid) {
 
 client.on('message', async message => {
     if (message.channel.type === 'dm' && message.author != client.user) { //dm
-        message.reply("Hi! I have no functioning commands here. But if you want me to add me to your own discord to interact with me click here: https://" + discordbotlink)
+        message.reply("Hi! I have no functioning commands here. But if you want me to add me to your own discord to interact with me click here: https://" + config.discordbotlink)
     }
     else if (message.author != client.user && message.guild.available) {
         console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
@@ -132,18 +131,16 @@ client.on('message', async message => {
         };
         try {
             if (user != client.user && permmember.has("SEND_MESSAGES")) {
+
                 messageParts = message.content.split(' ');
                 input = messageParts[0].toLowerCase();
                 parameters = messageParts.splice(1, messageParts.length);
+
                 prefix = await sql.getprefix(message.guild.id);
                 gotroleid = await sql.getvalue(message.guild.id, "PermRole");
-                if (playlist[message.guild.id] == undefined) {
-                    playlist[message.guild.id] = new Array();
-                    skiplist[message.guild.id] = new Array();
-                    votes[message.guild.id] = 0;
-                    skipsong[message.guild.id] = false;
-                    console.log("Created a new queue for " + message.guild.id)
-                }
+
+                musiccommands.playlistcheck(client, message);
+
                 if (input === prefix + "ping") {
                     infocommands.ping(client, message);
                 }
@@ -158,10 +155,10 @@ client.on('message', async message => {
                     infocommands.serverinfo(client, message);
                 }
                 else if (input === prefix + "help") {
-                    infocommands.helpinfo(client, message, helpinfo);
+                    infocommands.help(client, message, commands);
                 }
                 else if (input === prefix + "play") {
-                    musiccommands.play(client, message, paramaters);
+                    musiccommands.play(client, message, parameters,permmember);
                 }
                 else if (input === prefix + "stop") {
                     musiccommands.stop(client, message, gotroleid);
@@ -179,7 +176,7 @@ client.on('message', async message => {
                     giphycommands.search(client, message, parameters);
                 }
                 else if (input === prefix + "playtime") {
-                    musiccommands.playtime(client, message, parameters);
+                    musiccommands.setplaytime(client, message, parameters);
                 }
                 else if (input === prefix + "debug") {
                     message.reply(message.author.id);
