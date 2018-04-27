@@ -336,7 +336,7 @@ client.on('message', async message => {
                     }
                 }
                 else if (input === prefix + "imdb") {
-                    imdbcommands.search() herer
+                    imdbcommands.search(client,message,parameters);
                 }
                 else if (input === prefix + "giphy") {
                     bigpara = "";
@@ -354,12 +354,12 @@ client.on('message', async message => {
                         if (parameters[0] != ("" || undefined)) {
                             var c = TryParseInt(parameters[0], null);
                             if (c != null) {
-                                if (c <= maxyoutubevideotime) {
+                                if (c <= maxyoutubevideotime && c>=0) {
                                     sql.setplaytime(message.guild.id, c);
                                     message.reply("Set maximal video playtime to " + c + " seconds");
                                 }
                                 else {
-                                    message.reply("Sorry, you aren't allowed to set a higher playtime than " + maxyoutubevideotime + " seconds.");
+                                    message.reply("Sorry, you aren't allowed to set a lower then 0 and higher playtime than " + maxyoutubevideotime + " seconds.");
                                 }
                             }
                             else {
@@ -382,9 +382,6 @@ client.on('message', async message => {
                 }
                 else if ((input === prefix + "userinfo") || (input === prefix + "me")) {
                     infocommands.userinfo(client, message);
-                }
-                else {
-                    console.log("Not allowed to chat here.");
                 }
             }
         }
