@@ -1,11 +1,12 @@
 ﻿const imdb = require('imdb-api');
-imdbkey = config.imdbtoken;
+
 
 var config;
 
 module.exports = {
     init: function (c) {
         config = c;
+        imdbkey = config.imdbtoken;
     },
 
     search: async function (client, message, parameters) {
@@ -68,7 +69,6 @@ module.exports = {
             console.log(data);
             message.reply("Something went wrong while searching your movie on the IMDB api.")
         });
-    }
     }
 }
 

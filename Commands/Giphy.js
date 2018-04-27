@@ -1,10 +1,11 @@
-﻿var giphy = require('giphy-api')(config.giphytoken);
+﻿var giphy;
 
 var config;
 
 module.exports = {
     init: function (c) {
         config = c;
+        giphy = require('giphy-api')(config.giphytoken);
     },
 
     search: async function (client, message, parameters) {
@@ -17,7 +18,6 @@ module.exports = {
             message.reply(`Here's your random gif: ${res.data.url}`);
         });
     }
-}
 }
 
 function PermCheck(message, user, roleid) {

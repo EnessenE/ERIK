@@ -1,5 +1,29 @@
-﻿var sql;
+﻿const ytdl = require('ytdl-core');
+var YouTube = require('youtube-node');
+var youTube = new YouTube();
+
+var maxyoutubevideotime = 0; //seconds
+
+var playlist = new Array();
+var playing = new Array();
+var votes = new Array();
+var skipsong = new Array();
+var skiplist = new Array();
+
+var sql;
 var config;
+
+function TryParseInt(str, defaultValue) {
+    var retValue = defaultValue;
+    if (str !== null) {
+        if (str.length > 0) {
+            if (!isNaN(str)) {
+                retValue = parseInt(str);
+            }
+        }
+    }
+    return retValue;
+}
 
 function PermCheck(message, user, roleid) {
     var val = false;
@@ -21,6 +45,8 @@ module.exports = {
     init: function (s, c) {
         sql = s;
         config = c;
+        youTube.setKey(config.youtubetoken);
+        maxyoutubevideotime = config.maxyoutubevideotimedefault;
     },
 
     play: async function (client, message) {
@@ -204,4 +230,194 @@ module.exports = {
             message.reply(notallowed("stop", message.guild.id));
         }
     },
+}
+
+
+function resetsong(guildid) {
+    votes[guildid] = 0;
+    skiplist[guildid] = new Array();
+}
+
+async function killsong(guildid) {
+    playlist[guildid].splice(0, 1);
+    if (playlist[guildid][0] === undefined) {
+        mess = undefined;
+        link = undefined;
+        voice = undefined;
+        sort = 0;
+    }
+    else {
+        mess = playlist[guildid][0].messa;
+        link = playlist[guildid][0].link;
+        voice = playlist[guildid][0].voice;
+        sort = 2;
+    }
+    resetsong(guildid);
+    callplaylist(sort, mess, guildid, voice, link);
+}
+
+function alreadyvoted(name, guildid) {
+    for (var i = 0; i < skiplist[guildid].length; i++) {
+        if (skiplist[guildid][i] === name) {
+            return true
+        }
+    }
+    skiplist[guildid].push(name);
+    return false;
+}
+
+
+function getskipstatus(guildid) {
+    var stupid = skipsong[guildid];
+    return stupid;
+}
+
+async function play(message, para, voiceChannel, guildid) {
+    var numb = await sql.getvalue(message.guild.id, "played");
+    numb++;
+    sql.updatevalue(message.guild.id, "played", numb);
+
+    voiceChannel.join()
+        .then(connnection => {
+            var watch = para;
+            youTube.getById(youtube_parser(watch), function (error, result) {
+                if (error) {
+                    message.reply("An error occured in retrieving the title");
+                }
+                else {
+                    // data=JSON.stringify(result, null, 2);
+                    // message.reply("Now playing: " + result.items[0].snippet.localized.title + "\n URL: " + watch);
+                    messagearray = {
+                        embed: {
+                            color: 3066993,
+                            author: {
+                                name: "Currently playing for " + message.guild.name,
+                                icon_url: message.guild.iconURL
+                            },
+                            fields: [
+                                {
+                                    name: result.items[0].snippet.localized.title,
+                                    value: "Added by: " + playlist[message.guild.id][0].author + "\n" +
+                                        "Channel: " + playlist[message.guild.id][0].channel + "\n" +
+                                        "Length: " + playlist[message.guild.id][0].time + "\n" +
+                                        "Link: " + playlist[message.guild.id][0].link + "\n" +
+                                        "In queue after this: " + (playlist[guildid].length - 1)
+                                }
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                icon_url: client.user.avatarURL,
+                                text: discordbotlink
+                            }
+                        }
+                    };
+                    message.reply(messagearray);
+                }
+            });
+            const stream = ytdl(watch, { filter: 'audioonly', quality: 'lowest' });
+            const dispatcher = connnection.playStream(stream);
+            dispatcher.on('end', async function (error, result) {
+                console.log("Ended song! Skip status: " + getskipstatus(guildid));
+                if (getskipstatus(guildid) === false) {
+                    killsong(guildid);
+                    skipsong[guildid] = false;
+                }
+                else {
+                    console.log("Skipping song");
+                    var numb = await sql.getvalue(message.guild.id, "skipped");
+                    numb++;
+                    sql.updatevalue(message.guild.id, "skipped", numb);
+                    skipsong[guildid] = false;
+                }
+
+            });
+        });
+
+}
+
+function YTDurationToSeconds(duration) {
+    var match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+
+    match = match.slice(1).map(function (x) {
+        if (x != null) {
+            return x.replace(/\D/, '');
+        }
+    });
+
+    var hours = (parseInt(match[0]) || 0);
+    var minutes = (parseInt(match[1]) || 0);
+    var seconds = (parseInt(match[2]) || 0);
+
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+async function callplaylist(sort, message, guildid, voiceChannel, link, videotime) {//message,guidid,voiceChannel,parameters[0]
+    try {
+        console.log("Entered function " + sort + " - " + guildid + link);
+        var skip = false;
+        var yesthisskip = false;
+        if (sort === 0) {
+            if (client.voiceConnections.get(guildid) != undefined) {
+                client.voiceConnections.get(guildid).disconnect();
+                playing[guildid] = false;
+                votes[guildid] = 0;
+                skiplist[guildid] = new Array();
+                skip = true;
+                console.log("Left");
+            }
+        };
+        if (skip == false) {
+            if (sort === 1) {
+                author = message.author.tag;
+                vidname = "[youtube title]";
+                voice = voiceChannel;
+                messa = message;
+                videotime = await sql.getplaytime(guildid);
+                youTube.getById(youtube_parser(link), function (error, result) {
+                    if (error || result.items.length == 0) {
+                        message.reply("Sorry, I can't play a song right now. It seems that there is something wrong with youtube right now or your link is invalid.")
+                    }
+                    else {
+                        // data=JSON.stringify(result, null, 2);
+                        vidname = result.items[0].snippet.localized.title;
+                        time = YTDurationToSeconds(result.items[0].contentDetails.duration)
+                        channel = result.items[0].snippet.channelTitle;
+                        console.log("Song is " + time + " seconds. Livestream status: " + result.items[0].snippet.liveBroadcastContent + ".")
+                        if (time <= videotime && result.items[0].snippet.liveBroadcastContent === "none") {
+                            time = result.items[0].contentDetails.duration.replace("PT", "").toLowerCase();
+                            playlist[guildid].push({ link, author, voice, vidname, messa, guildid, time, channel });
+                            if ((playing[guildid] === undefined || playing[guildid] === false)) {
+                                console.log("Nothing playing for " + guildid);
+                                playing[guildid] = true;
+                                play(message, link, voiceChannel, guildid);
+                            }
+                            else {
+                                message.reply("Added '" + vidname + "' to the queue.");
+                            }
+                        }
+                        else if (time > videotime) {
+                            time = result.items[0].contentDetails.duration;
+                            message.reply("Song is not allowed to be longer then " + videotime / 60 + " minutes! Yours is: " + time.replace("PT", "").toLowerCase());
+                        }
+                        else if (result.items[0].snippet.liveBroadcastContent != "none") {
+                            message.reply("Song is not allowed to be a livestream!")
+                        }
+                    }
+                });
+            };
+            if (sort === 2 || sort === 3) {
+                playing[guildid] = true;
+                play(message, link, voiceChannel, guildid);
+            }
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
+function youtube_parser(url) {
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    return (match && match[7].length == 11) ? match[7] : false;
 }
