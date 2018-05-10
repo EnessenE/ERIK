@@ -31,8 +31,9 @@ var versioninfo = config.versioninfo;
 configcommands.init(sql, config);
 infocommands.init(sql, config, OS);
 imdbcommands.init(config);
-musiccommands.init(sql, config,client);
+musiccommands.init(sql, config, client);
 giphycommands.init(config);
+
 //end inits//
 
 var commands = [
@@ -45,11 +46,11 @@ var commands = [
     "queue", "Show the current queue.",
     "stop", "Stops the bot from playing music and clears the queue.",
     "playtime [seconds]", "Set the max video length for the bot",
-    "botcontrol [role name]","This role can set settings for the bot",
+    "botcontrol [role name]", "This role can set settings for the bot",
     "skip", "Vote to skip the current song. If you are the one who requested the song then song will be force skipped.",
     "avatar", "Links your avatar",
     "userinfo @[username]", "Get info about your and other discord accounts.",
-    "help - API's","From here we have commands based on a external API",
+    "help - API's", "From here we have commands based on a external API",
     "IMDB [movie title]", "Get info about your favorite movie!"
 ];
 
@@ -71,31 +72,39 @@ client.on('guildDelete', async guild => {
     sendtoadmin(`Removed from a discord: ` + guild.name + " - " + (guild.memberCount) + " members");
 });
 
+var admins;
+
 function getadminuser() {
     return new Promise(async function (resolve, reject) {
-        console.log("getting admin user.")
-        resolve(await client.fetchUser(config.adminuser));
+        var result = [];
+        config.admins.forEach(async function (admin) {
+            console.log("getting admin user: " + admin.toString());
+            var x = await client.fetchUser(admin.toString());
+            result.push(x);
+        });
+        resolve(result);
     })
 }
 
-var admin;
 async function sendtoadmin(message) {
     console.log(message);
-    if (admin == undefined) {
-        console.log("Getting admin user");
-        admin = await getadminuser();
+    if (admins == undefined) {
+        admins = await getadminuser();
     }
     console.log("Sending message: " + message.toString());
-    admin.send(message.toString());
+    admins.forEach(function (admin) {
+        admin.send(message.toString());
+    });
+
 }
 
-async function getmember(message,user) {
+async function getmember(message, user) {
     const botmember = await message.guild.fetchMember(user);
     return botmember;
 }
 
 function PermCheck(message, user, roleid) {
-    var val=false;
+    var val = false;
     return new Promise(function (resolve, reject) {
         roletarget = parseInt(roleid);
         message.member.roles.forEach(function (element) {
@@ -158,7 +167,7 @@ client.on('message', async message => {
                     infocommands.help(client, message, commands);
                 }
                 else if (input === prefix + "play") {
-                    musiccommands.play(client, message, parameters,permmember);
+                    musiccommands.play(client, message, parameters, permmember);
                 }
                 else if (input === prefix + "stop") {
                     musiccommands.stop(client, message, gotroleid);
@@ -170,7 +179,7 @@ client.on('message', async message => {
                     musiccommands.queue(client, message);
                 }
                 else if (input === prefix + "imdb") {
-                    imdbcommands.search(client,message,parameters);
+                    imdbcommands.search(client, message, parameters);
                 }
                 else if (input === prefix + "giphy") {
                     giphycommands.search(client, message, parameters);
@@ -193,7 +202,7 @@ client.on('message', async message => {
             console.log(erro);
         }
     }
-    }
+}
 );
 
 function notallowed(command, id) {

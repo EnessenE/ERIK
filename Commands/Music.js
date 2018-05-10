@@ -43,7 +43,7 @@ function PermCheck(message, user, roleid) {
 }
 
 module.exports = {
-    init: function (s, c,cl) {
+    init: function (s, c, cl) {
         sql = s;
         config = c;
         client = cl;
@@ -51,7 +51,7 @@ module.exports = {
         maxyoutubevideotime = config.maxyoutubevideotimedefault;
     },
 
-    play: async function (client, message, parameters,permmember) {
+    play: async function (client, message, parameters, permmember) {
         const voiceChannel = await message.member.voiceChannel;
         if (!voiceChannel) return message.reply("Please be in a voice channel first!");
         if (permmember.has("CONNECT") != true) return message.reply("Sorry, I can't connect to your voicechannel. I have insufficient permissions.");
@@ -222,7 +222,7 @@ module.exports = {
         }
     },
 
-    stop: async function (client, message,gotroleid) {
+    stop: async function (client, message, gotroleid) {
         if (await PermCheck(message, message.author, gotroleid) == true) {
             playlist[message.guild.id] = new Array();
             killsong(message.guild.id);
