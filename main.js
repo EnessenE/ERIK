@@ -121,7 +121,11 @@ function PermCheck(message, user, roleid) {
 
 client.on('message', async message => {
     if (message.channel.type === 'dm' && message.author != client.user) { //dm
-        message.reply("Hi! I have no functioning commands here. But if you want me to add me to your own discord to interact with me click here: https://" + config.discordbotlink)
+        var string;
+        config.admins.forEach(async function (admin) {
+            string += " <@" + admin + ">";
+        });
+        message.reply("Hi! I have no functioning commands here. If you want to talk about me contact " + string + ".")
     }
     else if (message.author != client.user && message.guild.available) {
         console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
