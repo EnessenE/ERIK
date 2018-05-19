@@ -127,7 +127,7 @@ client.on('message', async message => {
         });
         message.reply("Hi! I have no functioning commands here. If you want to talk about me contact " + string + ".")
     }
-    else if (message.author != client.user && message.guild.available) {
+    if (user != client.user && permmember.has("SEND_MESSAGES") && !message.author.tag.includes("#0000")) {
         console.log("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
         const user = message.author;
         sql.getserver(message.guild.id).then(out => {
