@@ -1,10 +1,9 @@
-﻿var sql;
+﻿const sql = require("../sql.js");
 var config;
 var OS;
 
 module.exports = {
-    init: function (s, c, s) {
-        sql = s;
+    init: function (c, s) {
         config = c;
         OS = s;
     },
@@ -70,7 +69,10 @@ module.exports = {
         message.guild.roles.forEach(function (element) {
             roleoutput = roleoutput + ", " + element.name;
         });
-        roleoutput = roleoutput.substr(3, roleoutput.length);
+
+        roleoutput = roleoutput.substr(2, roleoutput.length);
+        roleoutput = roleoutput.replace("@", "");
+
         message.reply({
             embed: {
                 color: 3447003,
@@ -112,6 +114,7 @@ module.exports = {
             }
         });
     },
+
     botinfo: async function (client, message) {
         message.reply({
             embed: {
