@@ -1,6 +1,6 @@
 {
   "name": "erikbot",
-  "version": "0.802",
+  "version": "0.81",
   "description": "The bot",
   "main": "main.js",
   "dependencies": {
