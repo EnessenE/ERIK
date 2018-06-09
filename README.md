@@ -1,3 +1,4 @@
+<a href="https://david-dm.org/enessene/erik" title="dependencies status"><img src="https://david-dm.org/enessene/erik/status.svg"/></a>
 # Erik
 
 ### Required to make this bot work
