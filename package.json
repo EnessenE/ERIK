@@ -1,6 +1,6 @@
 {
   "name": "erikbot",
-  "version": "0.81",
+  "version": "0.8.2",
   "description": "The bot",
   "main": "main.js",
   "dependencies": {
@@ -16,7 +16,7 @@
     "opusscript": "0.0.6",
     "os": "^0.1.1",
     "python": "0.0.4",
-    "request": "^2.83.0",
+    "request": "^2.87.0",
     "simple-ajax": "^2.6.0",
     "uws": "^10.148.0",
     "youtube-node": "^1.3.2",
