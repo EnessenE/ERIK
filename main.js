@@ -5,7 +5,7 @@ function timeout(delay) {
 }
 
 const config = require("./config.json");
-const sql = require("./sql.js");
+const sql = require("./Context/mysql.js");
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/Info.js");
@@ -27,6 +27,8 @@ var statusbot = botver + " | " + "/" + "help";
 var versioninfo = config.versioninfo;
 
 //inits//
+
+
 
 configcommands.init(sql, config);
 infocommands.init(config, OS);

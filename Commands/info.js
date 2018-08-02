@@ -1,4 +1,4 @@
-﻿const sql = require("../sql.js");
+﻿const sql = require("../Context/mysql.js");
 var config;
 var OS;
 
