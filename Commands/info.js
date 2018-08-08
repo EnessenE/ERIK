@@ -1,11 +1,12 @@
-﻿const sql = require("../Context/mysql.js");
-var config;
+﻿var config;
 var OS;
+var sql;
 
 module.exports = {
     init: function (c, s) {
         config = c;
         OS = s;
+        sql = require("../Context/" + config.SQL + ".js");
     },
 
     ping: async function (client, message) {

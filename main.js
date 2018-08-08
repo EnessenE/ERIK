@@ -5,7 +5,7 @@ function timeout(delay) {
 }
 
 const config = require("./config.json");
-const sql = require("./Context/mysql.js");
+const sql = require("./Context/"+config.SQL+".js");
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/Info.js");
