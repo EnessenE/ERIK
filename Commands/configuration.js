@@ -27,7 +27,7 @@ module.exports = {
         if (await PermCheck(message, message.author, gotroleid) === true) {
             if (parameters.length !== 0) {
                 //prefixset[message.guild.id] = parameters[0];
-                var result = sql.setprefix(message.guild.id, parameters[0]);
+                var result = await sql.setprefix(message.guild.id, parameters[0]);
                 console.log(result);
                 if (result==true) {
                     message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
