@@ -1,5 +1,4 @@
 ﻿var mssql = require('mssql');
-var mysql = require('mysql');
 const config = require("../config.json");
 
 const connection = new mssql.ConnectionPool({
@@ -26,11 +25,11 @@ async function checkexist(id, fn) {
     var returned;
     return new Promise(function (resolve, reject) {
         const request = new mssql.Request(connection)
-        request.input('id', mssql.NChar(999), id);
+        request.input('id', mssql.NChar(id.toString().length), id);
         request.query("SELECT * FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = false;
             if (result.recordset[0] != undefined) {
-               returned = true;
+                returned = true;
             }
             resolve(returned);
         });
@@ -41,7 +40,7 @@ async function createserver(id, servername, members, prefix, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
         const request = new mssql.Request(connection)
-        request.input('id', mssql.NChar(999), id);
+        request.input('id', mssql.NChar(id.toString().length), id);
         request.input('servername', mssql.NChar(999), servername);
         request.input('members', mssql.BigInt, members);
         request.input('prefix', mssql.NChar(999), prefix);
@@ -64,12 +63,22 @@ async function createserver(id, servername, members, prefix, owner, region) {
 function updateall(id, servername, members, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
+
         const request = new mssql.Request(connection)
-        request.query("UPDATE servers SET [servername]=" + mysql.escape(servername) + ", [members]=" + mysql.escape(members.toString()) + ", [owner]=" + mysql.escape(owner) + ", [region]=" + mysql.escape(region) + " WHERE [serverid]=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+
+        request.input('id', mssql.NChar(id.toString().length), id);
+        request.input('servername', mssql.NChar(999), servername);
+        request.input('members', mssql.BigInt, members);
+        request.input('region', mssql.NChar(999), region);
+        request.input('owner', mssql.NChar(999), owner);
+
+        request.query("UPDATE servers SET [servername]=@servername, [members]=@members, [owner]=@owner, [region]=@region WHERE [serverid]=@id;", async function ExistCheck(err, result) {
+
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
             }
+
             resolve("Successfully added");
         });
     });
@@ -80,12 +89,17 @@ function update(id, toset, newval) {
     return new Promise(function (resolve, reject) {
         try {
             const request = new mssql.Request(connection)
-            request.query("UPDATE [servers] SET  " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+            request.input('id', mssql.NChar(id.toString().length), id);
+            request.input('newval', mssql.NChar(newval.toString().length), newval);
+
+            request.query("UPDATE [servers] SET  " + toset + "=@newval WHERE serverid=@id;", async function ExistCheck(err, result) {
                 if (err) {
                     console.log(err);
-                    resolve("Couldn't create record!");
+                    resolve(false);
                 }
-                resolve(true);
+                else {
+                    resolve(true);
+                }
             });
         }
         catch (err) {
@@ -99,7 +113,7 @@ function checkprefix(id) {
     var returned;
     return new Promise(function (resolve, reject) {
         const request = new mssql.Request(connection)
-        request.input('id', mssql.NChar(999), id);
+        request.input('id', mssql.NChar(id.toString().length), id);
         request.query("SELECT prefix FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = "";
             if (result.recordset[0].prefix != undefined) {
@@ -115,12 +129,11 @@ function checkplaytime(id) {
     var returned;
     return new Promise(function (resolve, reject) {
         const request = new mssql.Request(connection)
-        request.input('id', mssql.NChar(999), id);
+        request.input('id', mssql.NChar(id.toString().length), id);
         request.query("SELECT maxplaytime FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = "";
-            //console.log("Checking for " + id);
-            if (result != undefined) {
-                returned = result.recordset[0];
+            if (result.recordset[0].maxplaytime != undefined) {
+                returned = result.recordset[0].maxplaytime;
             }
             resolve(returned);
         });
@@ -130,20 +143,19 @@ function checkplaytime(id) {
 
 function checkvalue(id, valuetocheck) {
     return new Promise(function (resolve, reject) {
-        var returned;
-        const request = new mssql.Request(connection)
 
-        request.input('id', mssql.NChar(999), id);
-        request.input('valuetocheck', mssql.NChar(999), valuetocheck);
-        console.log(id);
-        request.query("SELECT @valuetocheck FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
-            returned = "";
-            //console.log("Checking for " + id);
-            console.log(valuetocheck);
-            console.log(result.recordset[0].PermRole);
-            if (result.recordset[0][valuetocheck] != undefined) {
-                returned = result.recordset[0][valuetocheck];
+        const request = new mssql.Request(connection)
+        request.input('id', mssql.NChar(id.toString().length), id);
+
+        request.query("SELECT " + valuetocheck + " FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
+            var returned = "";
+            var recieved;
+            recieved = result.recordset[0][valuetocheck];
+
+            if (recieved != undefined) {
+                returned = recieved;
             }
+            console.log("returning " + recieved);
             resolve(returned);
         });
     });
