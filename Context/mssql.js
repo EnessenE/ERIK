@@ -17,16 +17,21 @@ connection.connect(err => {
     }
 })
 
+mssql.on('error', err => {
+    console.log("ERROR OCCURED: " + err);
+})
 
 async function checkexist(id, fn) {
+    console.log("Checking for " + id);
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
+        const request = new mssql.Request(connection)
+        request.input('id', mssql.NChar(999), id);
+        request.query("SELECT * FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = false;
-            //console.log("Checking for " + id);
-            result.forEach(function (e, err) {
-                returned = true;
-            });
+            if (result.recordset[0] != undefined) {
+               returned = true;
+            }
             resolve(returned);
         });
     });
@@ -35,7 +40,15 @@ async function checkexist(id, fn) {
 async function createserver(id, servername, members, prefix, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("INSERT INTO servers (`serverid`, `servername`, `members`, `prefix`, `owner`, `region`) VALUES (" + mysql.escape(id) + ", " + mysql.escape(connection.escape(servername)) + ", " + mysql.escape(members.toString()) + ", " + mysql.escape(prefix) + ", " + mysql.escape(owner) + ", " + mysql.escape(region) + ");", async function ExistCheck(err, result) {
+        const request = new mssql.Request(connection)
+        request.input('id', mssql.NChar(999), id);
+        request.input('servername', mssql.NChar(999), servername);
+        request.input('members', mssql.BigInt, members);
+        request.input('prefix', mssql.NChar(999), prefix);
+        request.input('region', mssql.NChar(999), region);
+        request.input('owner', mssql.NChar(999), owner);
+
+        request.query("INSERT INTO servers ([serverid], [servername], [members], [prefix], [owner], [region]) VALUES (@id, @servername, @members, @prefix, @owner, @region);", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -51,7 +64,8 @@ async function createserver(id, servername, members, prefix, owner, region) {
 function updateall(id, servername, members, owner, region) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("UPDATE `servers` SET `servername`=" + mysql.escape(servername) + ", `members`=" + mysql.escape(members.toString()) + ", `owner`=" + mysql.escape(owner) + ", `region`=" + mysql.escape(region) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+        const request = new mssql.Request(connection)
+        request.query("UPDATE servers SET [servername]=" + mysql.escape(servername) + ", [members]=" + mysql.escape(members.toString()) + ", [owner]=" + mysql.escape(owner) + ", [region]=" + mysql.escape(region) + " WHERE [serverid]=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
             if (err) {
                 console.log(err);
                 resolve("Couldn't create record!");
@@ -65,7 +79,8 @@ function update(id, toset, newval) {
     var returned;
     return new Promise(function (resolve, reject) {
         try {
-            connection.query("UPDATE `servers` SET " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
+            const request = new mssql.Request(connection)
+            request.query("UPDATE [servers] SET  " + toset + "=" + mysql.escape(newval) + " WHERE `serverid`=" + mysql.escape(id) + ";", async function ExistCheck(err, result) {
                 if (err) {
                     console.log(err);
                     resolve("Couldn't create record!");
@@ -83,12 +98,13 @@ function update(id, toset, newval) {
 function checkprefix(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
+        const request = new mssql.Request(connection)
+        request.input('id', mssql.NChar(999), id);
+        request.query("SELECT prefix FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = "";
-            //console.log("Checking for " + id);
-            result.forEach(function (e, err) {
-                returned = e.prefix;
-            });
+            if (result.recordset[0].prefix != undefined) {
+                returned = result.recordset[0].prefix;
+            }
             resolve(returned);
         });
     });
@@ -98,12 +114,14 @@ function checkprefix(id) {
 function checkplaytime(id) {
     var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
+        const request = new mssql.Request(connection)
+        request.input('id', mssql.NChar(999), id);
+        request.query("SELECT maxplaytime FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
-            result.forEach(function (e, err) {
-                returned = e.maxplaytime;
-            });
+            if (result != undefined) {
+                returned = result.recordset[0];
+            }
             resolve(returned);
         });
     });
@@ -111,14 +129,21 @@ function checkplaytime(id) {
 
 
 function checkvalue(id, valuetocheck) {
-    var returned;
     return new Promise(function (resolve, reject) {
-        connection.query("SELECT * FROM servers WHERE servers.serverid = " + mysql.escape(id) + "", async function ExistCheck(err, result, fields) {
+        var returned;
+        const request = new mssql.Request(connection)
+
+        request.input('id', mssql.NChar(999), id);
+        request.input('valuetocheck', mssql.NChar(999), valuetocheck);
+        console.log(id);
+        request.query("SELECT @valuetocheck FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = "";
             //console.log("Checking for " + id);
-            result.forEach(function (e, err) {
-                returned = e[valuetocheck];
-            });
+            console.log(valuetocheck);
+            console.log(result.recordset[0].PermRole);
+            if (result.recordset[0][valuetocheck] != undefined) {
+                returned = result.recordset[0][valuetocheck];
+            }
             resolve(returned);
         });
     });
