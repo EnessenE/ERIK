@@ -158,6 +158,7 @@ client.on('message', async message => {
                         parameters = messageParts.splice(1, messageParts.length);
 
                         prefix = await sql.getprefix(message.guild.id);
+                        console.log("GOT PREFIX: " + prefix);
                         gotroleid = await sql.getvalue(message.guild.id, "PermRole");
 
                         musiccommands.playlistcheck(client, message);
