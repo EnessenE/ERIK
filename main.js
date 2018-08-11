@@ -5,7 +5,7 @@ function timeout(delay) {
 }
 
 const config = require("./config.json");
-const sql = require("./sql.js");
+const sql = require("./Context/" + config.SQL + ".js");
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/Info.js");
@@ -27,6 +27,8 @@ var statusbot = botver + " | " + "/" + "help";
 var versioninfo = config.versioninfo;
 
 //inits//
+
+
 
 configcommands.init(sql, config);
 infocommands.init(config, OS);
@@ -156,6 +158,7 @@ client.on('message', async message => {
                         parameters = messageParts.splice(1, messageParts.length);
 
                         prefix = await sql.getprefix(message.guild.id);
+
                         gotroleid = await sql.getvalue(message.guild.id, "PermRole");
 
                         musiccommands.playlistcheck(client, message);

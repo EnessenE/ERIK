@@ -1,5 +1,5 @@
 ﻿var mysql = require('mysql');
-const config = require("./config.json");
+const config = require("../config.json");
 
 
 var connection = mysql.createConnection({
@@ -13,7 +13,7 @@ connection.connect(function (err) {
     if (!err) {
         console.log("Database is connected");
     } else {
-        console.log("Error connecting database: "+err);
+        console.log("MYSQL Error connecting database: "+err);
     }
 });
 
