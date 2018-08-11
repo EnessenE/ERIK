@@ -28,7 +28,7 @@ async function checkexist(id, fn) {
         request.input('id', mssql.NChar(id.toString().length), id);
         request.query("SELECT * FROM servers WHERE servers.serverid = @id", async function ExistCheck(err, result, fields) {
             returned = false;
-            if (result.recordset[0] != undefined) {
+            if (result && result.recordset[0] != undefined) {
                 returned = true;
             }
             resolve(returned);
