@@ -5,7 +5,7 @@ function timeout(delay) {
 }
 
 const config = require("./config.json");
-const sql = require("./Context/"+config.SQL+".js");
+const sql = require("./Context/" + config.SQL + ".js");
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/Info.js");
@@ -158,7 +158,7 @@ client.on('message', async message => {
                         parameters = messageParts.splice(1, messageParts.length);
 
                         prefix = await sql.getprefix(message.guild.id);
-                        console.log("GOT PREFIX: " + prefix);
+
                         gotroleid = await sql.getvalue(message.guild.id, "PermRole");
 
                         musiccommands.playlistcheck(client, message);
