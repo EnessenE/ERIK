@@ -41,11 +41,11 @@ async function createserver(id, servername, members, prefix, owner, region) {
     return new Promise(function (resolve, reject) {
         const request = new mssql.Request(connection)
         request.input('id', mssql.NChar(id.toString().length), id);
-        request.input('servername', mssql.NChar(999), servername);
+        request.input('servername', mssql.NChar(server.length), servername);
         request.input('members', mssql.BigInt, members);
-        request.input('prefix', mssql.NChar(999), prefix);
-        request.input('region', mssql.NChar(999), region);
-        request.input('owner', mssql.NChar(999), owner);
+        request.input('prefix', mssql.NChar(prefix.length), prefix);
+        request.input('region', mssql.NChar(region.length), region);
+        request.input('owner', mssql.NChar(owner.length), owner);
 
         request.query("INSERT INTO servers ([serverid], [servername], [members], [prefix], [owner], [region]) VALUES (@id, @servername, @members, @prefix, @owner, @region);", async function ExistCheck(err, result) {
             if (err) {
@@ -67,10 +67,10 @@ function updateall(id, servername, members, owner, region) {
         const request = new mssql.Request(connection)
 
         request.input('id', mssql.NChar(id.toString().length), id);
-        request.input('servername', mssql.NChar(999), servername);
+        request.input('servername', mssql.NChar(server.length), servername);
         request.input('members', mssql.BigInt, members);
-        request.input('region', mssql.NChar(999), region);
-        request.input('owner', mssql.NChar(999), owner);
+        request.input('region', mssql.NChar(region.length), region);
+        request.input('owner', mssql.NChar(owner.length), owner);
 
         request.query("UPDATE servers SET [servername]=@servername, [members]=@members, [owner]=@owner, [region]=@region WHERE [serverid]=@id;", async function ExistCheck(err, result) {
 
