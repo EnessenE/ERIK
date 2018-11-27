@@ -1,17 +1,32 @@
 {
-  "name": "erikbot",
-  "version": "0.8.2",
+  "name": "erik",
+  "version": "1.0.0",
   "description": "The bot",
   "main": "main.js",
   "dependencies": {
+    "bufferutil": "^3.0.2",
+    "discord.js": "^11.4.2"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Enes",
   "license": "ISC",
   "optionalDependencies": {
     "bufferutil": "^3.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EnessenE/erik.git"
+  },
+  "keywords": [
+    "bot",
+    "discord",
+    "administrative"
+  ],
+  "bugs": {
+    "url": "https://github.com/EnessenE/erik/issues"
+  },
+  "homepage": "https://github.com/EnessenE/erik#readme"
 }
