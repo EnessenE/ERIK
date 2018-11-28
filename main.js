@@ -11,20 +11,24 @@ const { RichEmbed } = require('discord.js');
 
 const client = new Discord.Client();
 
-var statusbot = config.info.status[0];
-
 var commands = [
     "help", "List of commands.",
     "prefix [new prefix]", "Set a new prefix for the bot.",
     "ping", "Ping of the bot to discord.",
-    "you", "Bot information",
+    "you/botinfo", "Bot information",
     "serverinfo", "Server information",
     "userinfo @user", "Information about a user",
     "me", "Information about you"
 ];
 
 var admins = [];
+var contacts;
 
+function randomStatus() {
+    var random = Math.floor(Math.random() * config.info.status.length) + 0;
+    var status = config.info.status[random];
+    client.user.setActivity(`${ status }`);
+}
 
 async function SendToAdmin(message) {
     if (admins == undefined) {
@@ -93,7 +97,7 @@ function initialize_misc() {
             // Set the title of the field
             .setTitle("Startup information")
             // Set the color of the embed
-            .setColor("#0000ff")
+            .setColor("#00a9ff")
             // Set the main content of the embed
             .setDescription("Bot information that was gathered when the bot was started");
 
@@ -105,7 +109,7 @@ function initialize_misc() {
         embed.addField("Online users", client.users.size);
         embed.setTimestamp(new Date());
         SendToAdmin(embed);
-        client.user.setActivity(statusbot);
+        randomStatus();
     });
 
     client.on('guildCreate', async guild => {
@@ -118,7 +122,7 @@ function initialize_misc() {
 }
 
 function initialize_main() {
-    var contacts = "";
+    contacts = "";
     config.settings.admins.forEach(async function (admin) {
         contacts += " or <@" + admin + ">";
     });
@@ -139,6 +143,7 @@ async function messageEvent(message) {
                 var serverdata = null;//await repo.GetServer(await message.guild.id);
 
                 if (serverdata === null) {//id,servername,members,prefix,owner
+                    //var result = await repo.CreateServer(message);
                     //print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region), true);
                 }
                 else {
@@ -150,97 +155,89 @@ async function messageEvent(message) {
 
                     var messageParts = message.content.split(' ');
                     var input = messageParts[0].toLowerCase();
+
                     var parameters = messageParts.splice(1, messageParts.length);
 
                     var prefix = await getPrefix();
                     //var role_id = await repo.GetValue(message.guild.id, "PermRole");
 
-                    if (prefix != null) {
-                        try {
-
-                            commandLogic(prefix, message, role_id);
-                        }
-                        catch (error) {
-                            print("Error: " + error);
-                            sendErrorToAdmin("Error occured in commandLogic", error, message);
+                    try {
+                        if (prefix != null) {
+                            if (input.charAt(0) == prefix) {
+                                var command = input.substr(1);
+                                commandLogic(prefix, null, message, command);
+                            }
                         }
                     }
+                    catch (error) {
+                        print("Error: " + error);
+                        sendErrorToAdmin("Error occured in commandLogic", error, message);
+                    }
+
                 }
             }
         }
     }
 }
 
-function commandLogic(prefix, message, role_id) {
-    if (input.charAt(0) == prefix) {
-        var command = input.substr(1);
-        if (command === prefix + "ping") {
-            infocommands.ping(client, message);
+function commandLogic(prefix, role_id, message, command) {
+    if (command === "ping") {
+        infocommands.ping(client, message);
+    }
+    else if (command === "you" || command === "botinfo") {
+        infocommands.botinfo(client, message);
+    }
+    else if (command === "prefix") {
+        configcommands.setprefix(client, message, parameters);
+    }
+    else if (command === "serverinfo") {
+        infocommands.serverinfo(client, message);
+    }
+    else if (command === "help") {
+        helparray = "";
+        var list = 0;
+        for (i = 0; i < commands.length / 2; i++) {
+            helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
+            list += 2;
         }
-        else if (command === "you") {
-            infocommands.botinfo(client, message);
-        }
-        else if (command === "prefix") {
-            configcommands.setprefix(client, message, parameters);
-        }
-        else if (command === "serverinfo") {
-            infocommands.serverinfo(client, message);
-        }
-        else if (command === "help") {
-            helparray = "";
-            var list = 0;
-            for (i = 0; i < commands.length / 2; i++) {
-                helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
-                list += 2;
-            }
-            messagearray = {
-                embed: {
-                    color: 3066993,
-                    author: {
-                        name: "Commands for " + message.guild.name,
-                        icon_url: message.guild.iconURL
-                    },
-                    fields: [
-                        {
-                            name: "Help",
-                            value: helparray
-                        }
-                    ],
-                    timestamp: new Date(),
-                    footer: {
-                        icon_url: client.user.avatarURL,
-                        text: config.info.link
+        messagearray = {
+            embed: {
+                color: 3066993,
+                author: {
+                    name: "Commands for " + message.guild.name,
+                    icon_url: message.guild.iconURL
+                },
+                fields: [
+                    {
+                        name: "Help",
+                        value: helparray
                     }
+                ],
+                timestamp: new Date(),
+                footer: {
+                    icon_url: client.user.avatarURL,
+                    text: config.info.link
                 }
-            };
-            message.reply(messagearray);
-        }
-        else if (command === "botcontrol") {
-            configcommands.setbotcontrol(message, parameters);
-        }
-        else if ((command === "userinfo") || (command === "me")) {
-            infocommands.userinfo(client, message, parameters);
-        }
-        else {
-            GuildSpecificCommands(message);
-        }
+            }
+        };
+        message.reply(messagearray);
+    }
+    else if (command === "botcontrol") {
+        configcommands.setbotcontrol(message, parameters);
+    }
+    else if ((command === "userinfo") || (command === "me")) {
+        infocommands.userinfo(client, message, parameters);
+    }
+    else {
+        GuildSpecificCommands(message);
     }
 }
 
 function GuildSpecificCommands(message) {
     var pass = false;
-    for (var i = 0; i < config.specialguilds.length; i++) {
-        if (message.guild.id == config.specialguilds[i]) {
+    for (var i = 0; i < config.settings.specialguilds.length; i++) {
+        if (message.guild.id == config.settings.specialguilds[i]) {
             pass = true;
-        }
-    }
-    if (pass) {
-        messageParts = message.content.split(' ');
-        input = messageParts[0].toLowerCase();
-        parameters = messageParts.splice(1, messageParts.length);
-
-        if (input === prefix + "credits") {
-            message.reply("Try again later.");
         }
     }
 }

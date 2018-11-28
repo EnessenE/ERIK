@@ -1,7 +1,21 @@
 ﻿var repo;
 var config;
 var OS;
-const Discord = require(`discord.js`);
+const { Discord, RichEmbed } = require('discord.js');
+
+function getAllRoles(message) {
+    var roleoutput = ``;
+    message.guild.roles.forEach(function (element) {
+        if (roleoutput.length > 0) {
+            roleoutput = `${roleoutput}, ${element.name}`;
+        }
+        else {
+            roleoutput = `${element.name}`;
+        }
+
+    });
+    return roleoutput;
+}
 
 module.exports = {
     init: function (s, c, os) {
@@ -11,41 +25,43 @@ module.exports = {
     },
 
     ping: async function (client, message) {
-        message.reply('My ping to discord is ' + client.ping + ' ms.');
+        message.reply(`My ping to discord is ${Math.round(client.ping)} ms.`);
     },
 
     botinfo: async function (client, message) {
-        message.reply({
-            embed: {
-                color: 3447003,
-                author: {
-                    name: `Bot information for ${client.user.tag}`,
-                    icon_url: client.user.avatarURL
-                },
-                fields: [{
-                    name: `Generic`,
-                    value:
-                        `Uptime: ${Math.floor(((client.uptime / 1000.0) / 60 / 60), 1)} hour(s) \n` +
-                        `Running on: ${client.guilds.size} servers \n` +
-                        `Running for: ${client.users.size} online users \n` +
-                        `Github: ${config.info.github}`
-                },
-                {
-                    name: `Version ${config.info.version}`,
-                    value: (`${config.info.description}` || `No info for this version.`)
-                },
-                {
-                    name: `Back-end info`,
-                    value: `Current server: ${OS.hostname()}`
-                }
-                ],
-                timestamp: new Date(),
-                footer: {
-                    icon_url: client.user.avatarURL,
-                    text: config.info.link
-                }
-            }
-        });
+        var uptime = Math.floor(((client.uptime / 1000.0) / 60 / 60), 1);
+        var hours = "hour";
+        var servers = "server";
+
+        if (uptime !== 1) {
+            hours = `hours`;
+        }
+        if (client.guilds.size !== 1) {
+            server = "servers";
+        }
+
+        var genericInfo = `Uptime: ${uptime} ${hours} \n` +
+            `Running on: ${client.guilds.size} ${servers} \n` +
+            `Running for: ${client.users.size} online users \n` +
+            `Github: ${config.info.github}`;
+
+        const embed = new RichEmbed()
+            // Set the title of the field
+            // Set the color of the embed
+            .setColor("#4286f4")
+            // Set the main content of the embed
+            .setDescription(`Bot information that was gathered`);
+
+        embed.addField("Generic info", genericInfo);
+
+        embed.addField(`Version ${config.info.version}`, `${config.info.description}` || `No info for this version.`);
+
+        embed.addField("Host", OS.hostname());
+        embed.setTimestamp(new Date());
+        embed.setAuthor(`Bot information for ${client.user.tag}`, client.user.avatarURL);
+
+        message.reply(embed);
+
     },
 
     userinfo: async function (client, message, parameters) {
@@ -82,7 +98,7 @@ module.exports = {
             }
             roleoutput = ``;
             gotmember.roles.forEach(function (element) {
-                roleoutput = `${ roleoutput }, ${element.name}`;
+                roleoutput = `${roleoutput}, ${element.name}`;
             });
             roleoutput = roleoutput.substr(3, roleoutput.length);
             messagearray = {
@@ -127,16 +143,14 @@ module.exports = {
     },
 
     serverinfo: async function (client, message) {
-        var roleoutput = ``;
-        message.guild.roles.forEach(function (element) {
-            roleoutput = `${roleoutput}, ${element.name}`;
-        });
-        roleoutput = roleoutput.substr(2, roleoutput.length);
-        roleoutput = roleoutput.replace(`@everyone`, `everyone`);
+        var icon = message.guild.iconURL;
+        if (icon != null) {
+            icon = "No icon was set";
+        }
 
-        var data = [];
+        var data = new RichEmbed();
+
         data.title = `Server information for ${message.guild.name}`;
-        data = new Discord.RichEmbed(data);
 
         data.color = 3447003;
         data.thumbnail = message.guild.iconURL;
@@ -150,18 +164,22 @@ module.exports = {
             `**Created at:** ${message.guild.createdAt} \n` +
             `**Verification level:** ${message.guild.verificationLevel} \n` +
             `**AFK timeout:** ${message.guild.afkTimeout / 60} minute(s) \n` +
-            `**Icon:** ${message.guild.iconURL}\n`;
+            `**Icon:** ${icon}\n`;
         data.addField(`Generic`, generic, false);
 
-        data.addField(`Roles`, roleoutput, false);
+        data.addField(`Roles`, getAllRoles(message), false);
 
-        var prefix = await repo.GetPrefix(message.guild.id);
-        var webhooks = (await repo.GetWebhooksFromServer(message.guild.id)).length;
-        var botcontrol = await repo.GetValue(message.guild.id, "PermRole");
+        var prefix = "Not able to retrieve prefix for this server.";
+        var botcontrol = 0;
+        if (repo != null) {
+            prefix = await repo.GetPrefix(message.guild.id);
+            botcontrol = await repo.GetValue(message.guild.id, "PermRole");
+        }
+
         var settings = `**Prefix:** ${prefix} \n` +
-            `**Webhooks**: ${webhooks} \n` +
             `**BotControl:** <@&${botcontrol}>`;
         data.addField(`Server specific bot configuration`, settings, false);
+
 
 
         message.reply(data);
