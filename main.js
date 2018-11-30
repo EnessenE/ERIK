@@ -165,7 +165,7 @@ async function messageEvent(message) {
                         if (prefix != null) {
                             if (input.charAt(0) == prefix) {
                                 var command = input.substr(1);
-                                commandLogic(prefix, null, message, command);
+                                commandLogic(prefix, null, message, command, parameters);
                             }
                         }
                     }
@@ -180,7 +180,7 @@ async function messageEvent(message) {
     }
 }
 
-function commandLogic(prefix, role_id, message, command) {
+function commandLogic(prefix, role_id, message, command, parameters) {
     if (command === "ping") {
         infocommands.ping(client, message);
     }
