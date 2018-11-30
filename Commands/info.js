@@ -144,7 +144,8 @@ module.exports = {
 
     serverinfo: async function (client, message) {
         var icon = message.guild.iconURL;
-        if (icon != null) {
+
+        if (icon == null) {
             icon = "No icon was set";
         }
 
@@ -171,17 +172,51 @@ module.exports = {
 
         var prefix = "Not able to retrieve prefix for this server.";
         var botcontrol = 0;
+
         if (repo != null) {
             prefix = await repo.GetPrefix(message.guild.id);
             botcontrol = await repo.GetValue(message.guild.id, "PermRole");
         }
+        else {
+            botcontrol = -1;
+        }
 
-        var settings = `**Prefix:** ${prefix} \n` +
-            `**BotControl:** <@&${botcontrol}>`;
+        permissionrole = "** BotControl:** ";
+        if (botcontrol > 0) {
+            permissionrole += `<@&${botcontrol}>`;
+        }
+        else if (botcontrol == -1) {
+            permissionrole += "Not able to retrieve a role from the database";
+        }
+
+        var settings = `**Prefix:** ${prefix} \n` + permissionrole;
+
         data.addField(`Server specific bot configuration`, settings, false);
 
-
-
         message.reply(data);
+    },
+
+    help: function (client, prefix, message, commands) {
+        helparray = "";
+
+        var list = 0;
+        for (i = 0; i < commands.length / 2; i++) {
+            helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
+            list += 2;
+        }
+
+        const embed = new RichEmbed()
+            // Set the title of the field
+            // Set the color of the embed
+            .setColor("#4286f4")
+            // Set the main content of the embed
+            .setDescription(`Public bot commands`);
+
+        embed.addField("Commands", helparray);
+
+        embed.setTimestamp(new Date());
+        embed.setAuthor(`Bot information for ${client.user.tag}`, client.user.avatarURL);
+
+        message.reply(embed);
     }
 }

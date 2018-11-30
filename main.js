@@ -12,7 +12,7 @@ const { RichEmbed } = require('discord.js');
 const client = new Discord.Client();
 
 var commands = [
-    "help", "List of commands.",
+    "help/commands", "List of commands.",
     "prefix [new prefix]", "Set a new prefix for the bot.",
     "ping", "Ping of the bot to discord.",
     "you/botinfo", "Bot information",
@@ -158,7 +158,7 @@ async function messageEvent(message) {
 
                     var parameters = messageParts.splice(1, messageParts.length);
 
-                    var prefix = await getPrefix();
+                    var prefix = await getPrefix(message.guild.id);
                     //var role_id = await repo.GetValue(message.guild.id, "PermRole");
 
                     try {
@@ -193,34 +193,8 @@ function commandLogic(prefix, role_id, message, command) {
     else if (command === "serverinfo") {
         infocommands.serverinfo(client, message);
     }
-    else if (command === "help") {
-        helparray = "";
-        var list = 0;
-        for (i = 0; i < commands.length / 2; i++) {
-            helparray = helparray + "**" + prefix + commands[list] + "** - " + commands[list + 1] + "\n";
-            list += 2;
-        }
-        messagearray = {
-            embed: {
-                color: 3066993,
-                author: {
-                    name: "Commands for " + message.guild.name,
-                    icon_url: message.guild.iconURL
-                },
-                fields: [
-                    {
-                        name: "Help",
-                        value: helparray
-                    }
-                ],
-                timestamp: new Date(),
-                footer: {
-                    icon_url: client.user.avatarURL,
-                    text: config.info.link
-                }
-            }
-        };
-        message.reply(messagearray);
+    else if (command === "help" || command ==="commands") {
+        infocommands.help(client, prefix, message, commands);
     }
     else if (command === "botcontrol") {
         configcommands.setbotcontrol(message, parameters);
