@@ -1,6 +1,5 @@
 const config = require("./Settings/config.json");
-//const repo = require("./Repo/Repository.js");
-const repo = null;
+const repo = require("./Repo/Repository.js");
 const OS = require('os');
 
 const configcommands = require("./Commands/configuration.js");
@@ -69,7 +68,7 @@ function print(message, override) {
 async function getPrefix(guildid) {
     var result = config.default.prefix;
     if (repo !== null) {
-        result = await repo.GetPrefix(message.guild.id);
+        result = await repo.GetPrefix(guildid);
         if (result == null) {
             result = config.default.prefix;
         }
@@ -128,52 +127,56 @@ function initialize_main() {
 }
 
 async function messageEvent(message) {
+    try {
+        if (message.author != client.user) {
+            if (message.channel.type === 'dm') {
+                message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${contacts}. Or to add me visit ${config.info.invitelink}`);
+            }
+            else {
+                if (message.guild.available) {
+                    const user = message.author;
 
-    if (message.author != client.user) {
-        if (message.channel.type === 'dm') {
-            message.reply(`Hi! I have no functioning commands here. If you want to talk about me contact${contacts}. Or to add me visit ${config.info.invitelink}`);
-        }
-        else {
-            if (message.guild.available) {
-                const user = message.author;
+                    var serverdata = null;//await repo.GetServer(await message.guild.id);
 
-                var serverdata = null;//await repo.GetServer(await message.guild.id);
+                    if (serverdata === null) {//id,servername,members,prefix,owner
+                        //var result = await repo.CreateServer(message);
+                        //print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region), true);
+                    }
+                    else {
+                        //TODO: apply cashing here
+                        //repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
+                    }
+                    if (user.tag !== client.user.tag) {
+                        print("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
 
-                if (serverdata === null) {//id,servername,members,prefix,owner
-                    //var result = await repo.CreateServer(message);
-                    //print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region), true);
-                }
-                else {
-                    //TODO: apply cashing here
-                    //repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
-                }
-                if (user.tag !== client.user.tag) {
-                    print("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
+                        var messageParts = message.content.split(' ');
+                        var input = messageParts[0].toLowerCase();
 
-                    var messageParts = message.content.split(' ');
-                    var input = messageParts[0].toLowerCase();
+                        var parameters = messageParts.splice(1, messageParts.length);
 
-                    var parameters = messageParts.splice(1, messageParts.length);
+                        var prefix = await getPrefix(message.guild.id);
+                        //var role_id = await repo.GetValue(message.guild.id, "PermRole");
 
-                    var prefix = await getPrefix(message.guild.id);
-                    //var role_id = await repo.GetValue(message.guild.id, "PermRole");
-
-                    try {
-                        if (prefix != null) {
-                            if (input.charAt(0) == prefix) {
-                                var command = input.substr(1);
-                                commandLogic(prefix, null, message, command, parameters);
+                        try {
+                            if (prefix != null) {
+                                if (input.charAt(0) == prefix) {
+                                    var command = input.substr(1);
+                                    commandLogic(prefix, null, message, command, parameters);
+                                }
                             }
                         }
-                    }
-                    catch (error) {
-                        print("Error: " + error);
-                        sendErrorToAdmin("Error occured in commandLogic", error, message);
-                    }
+                        catch (error) {
+                            print("Error: " + error);
+                            sendErrorToAdmin("Error occured in commandLogic", error, message);
+                        }
 
+                    }
                 }
             }
         }
+    }
+    catch (error) {
+        sendErrorToAdmin("Error occured in messageEvent", error, message);
     }
 }
 
