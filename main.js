@@ -40,14 +40,14 @@ async function SendToAdmin(message) {
 }
 
 function sendErrorToAdmin(header, text, message) {
-    const embed = new RichEmbed()
+    const embed = new RichEmbed();
         // Set the title of the field
-        .setTitle(header)
+    embed.setTitle(header);
         // Set the color of the embed
-        .setColor(0xFF0000)
+    embed.setColor(0xFF0000);
         // Set the main content of the embed
 
-        .setDescription(text);
+    embed.setDescription(text);
     // Send the embed to the same channel as the message
     if (message != undefined) {
 
@@ -59,9 +59,6 @@ function sendErrorToAdmin(header, text, message) {
 
     SendToAdmin(embed);
 }
-
-configcommands.init(repo, config);
-infocommands.init(repo, config, OS);
 
 function print(message, override) {
     if (config.costum.debugging || override) {
@@ -95,11 +92,11 @@ function initialize_misc() {
         await GetAdmins();
         const embed = new RichEmbed()
             // Set the title of the field
-            .setTitle("Startup information")
+        embed.setTitle("Startup information")
             // Set the color of the embed
-            .setColor("#00a9ff")
+        embed.setColor("#00a9ff")
             // Set the main content of the embed
-            .setDescription("Bot information that was gathered when the bot was started");
+        embed.setDescription("Bot information that was gathered when the bot was started");
 
         print(`Logged in as ${client.user.tag}!`, true);
         embed.setThumbnail(client.user.avatarURL);
@@ -217,7 +214,7 @@ function GuildSpecificCommands(message) {
 }
 
 function notallowed(command, id) {
-    return "You are not allowed to use the " + prefix + command + " command."
+    return "You are not allowed to use the " + prefix + command + " command.";
 }
 
 function PermCheck(message, user, roleid) {
@@ -233,12 +230,44 @@ function PermCheck(message, user, roleid) {
             val = true;
         }
         resolve(val);
-    })
+    });
+}
+
+
+function IsAdmin(id) {
+    return new Promise(function (resolve, reject) {
+        config.settings.admins.forEach(async function (x) {
+            if (x == id) {
+                resolve(true);
+            }
+        });
+        resolve(false);
+    });
+}
+
+function hasPermission(message, user, roleid) {
+    var val = false;
+    return new Promise(function (resolve, reject) {
+        roletarget = parseInt(roleid);
+        message.member.roles.forEach(function (element) {
+            if (roletarget == parseInt(element.id)) {
+                val = true;
+            }
+        });
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+            val = true;
+        }
+        resolve(val);
+    });
 }
 
 async function Start_Bot() {
+    configcommands.init(repo, config);
+    infocommands.init(repo, config, OS);
+
     await initialize_misc();
     await client.login(config.token.discord);
+
     print("Bot has started", true);
     initialize_main();
 
@@ -246,11 +275,6 @@ async function Start_Bot() {
 
 Start_Bot();
 
-
-
-//setTimeout(function () {
-//    StartWebserver();
-//}, 3000);
 
 
 

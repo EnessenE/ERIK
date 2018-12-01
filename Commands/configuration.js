@@ -1,33 +1,6 @@
 ﻿var repo;
 var config;
 
-function PermCheck(message, user, roleid) {
-    var val = false;
-    return new Promise(function (resolve, reject) {
-        roletarget = parseInt(roleid);
-        message.member.roles.forEach(function (element) {
-            if (roletarget == parseInt(element.id)) {
-                val = true;
-            }
-        });
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-            val = true;
-        }
-        resolve(val);
-    });
-}
-
-function IsAdmin(id) {
-    return new Promise(function (resolve, reject) {
-        config.settings.admins.forEach(async function (x) {
-            if (x == id) {
-                resolve(true);
-            }
-        });
-        resolve(false);
-    });
-}
-
 module.exports = {
     init: function (s, c) {
         repo = s;
@@ -35,27 +8,30 @@ module.exports = {
     },
 
     setprefix: async function (client, message, parameters) {
-        if (await PermCheck(message, message.author, gotroleid) === true) {
-            if (parameters.length !== 0) {
-                //prefixset[message.guild.id] = parameters[0];
+        if (parameters.length !== 0) {
+            //prefixset[message.guild.id] = parameters[0];
+            if (repo != null) {
                 var result = await repo.SetPrefix(message.guild.id, parameters[0]);
-                console.log(result);
-                if (result == true) {
-                    message.reply("Changed the prefix from " + prefix + " to " + parameters[0] + ".");
+                if (result != null) {
+                    message.reply("Changed the prefix from " + prefix + " to " + result + ".");
                 }
                 else {
-                    message.reply("Something went wrong while changing your prefix!");
+                    message.reply("I wasn't able to set the prefix. No changes were made.");
                 }
+            }
+            else {
+                message.reply("I wasn't able to set the prefix. No database connection is available. No changes were made.");
             }
         }
         else {
-            message.reply(notallowed("prefix", message.guild.id));
+            message.reply("You need to define what prefix you want.");
         }
+
     },
 
     setbotcontrol: async function (message, parameters) {
-        if (message.member.hasPermission("ADMINISTRATOR") || IsAdmin(message.author.id)) {
-            if (parameters[0] != ("" || undefined)) {
+        if (parameters[0] != ("" || undefined)) {
+            if (repo != null) {
                 bigpara = "";
                 for (var i = 0; i < parameters.length; i++) {
                     bigpara = bigpara + " " + parameters[i]
@@ -64,6 +40,7 @@ module.exports = {
                 var found = false;
                 var roleid = 0;
                 var rolename = "";
+
                 message.guild.roles.forEach(function (element) {
                     if (element.name == bigpara) {
                         found = true;
@@ -84,25 +61,11 @@ module.exports = {
                 }
             }
             else {
-                roleid = 0;
-                rolename = "";
-                message.guild.roles.forEach(function (element) {
-                    if (element.id == gotroleid) {
-                        found = true;
-                        roleid = element.id;
-                        rolename = element.name;
-                    }
-                });
-                if (roleid != 0) {
-                    message.reply("The role that can control me is " + rolename + ".");
-                }
-                else {
-                    message.reply("No role has been set to control me. qq");
-                }
+                message.reply("I wasn't able to make any changes, the database isn't set.")
             }
         }
         else {
-            message.reply("Sorry, you need the Administrator permission to change this.");
+            message.reply("You need the define a role. Recommended parameter: @<role> ");
         }
     }
 }
