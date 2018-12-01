@@ -3,14 +3,6 @@ const db = require("../Context/" + config.sql.type + ".js");
 
 
 module.exports = {
-    GetData: async function (what, where, target) {
-        return await db.GetData(what, where, target);
-    },
-
-    GetServerFromWebhook: async function (webhook) {
-        return await db.GetServerFromWebhook(webhook);
-    },
-
     CreateServer: async function (id, servername, members, prefix, owner, region) {
         return await db.CreateServer(id, servername, members, prefix, owner, region);
     },
@@ -32,25 +24,5 @@ module.exports = {
 
     SetPrefix: async function (serverid, prefix) {
         return await db.UpdateValue(serverid, "prefix", prefix);
-    },
-
-    DeleteWebhook: async function (deleteid) {
-        return await db.DeleteWebhook(deleteid);
-    },
-
-    CreateWebhook: async function (serverid, webhook) {
-        return await db.CreateWebhook(serverid, webhook);        
-    },
-
-    GetWebhooksFromServer: async function (id) {
-        return await db.GetWebhooksFromServer(id);
-    },
-
-    GetAllWebhooks: async function (client) {
-        return await db.GetAllWebhooks(client);
-    },
-
-    GetWebhookByUrl: async function (url) {
-        return await db.GetWebhookByUrl(url);
     }
 }
