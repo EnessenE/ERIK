@@ -23,6 +23,6 @@ module.exports = {
     },
 
     SetPrefix: async function (serverid, prefix) {
-        return await db.UpdateValue(serverid, "prefix", prefix);
+        return await db.setPrefix(serverid, "prefix", prefix);
     }
 }

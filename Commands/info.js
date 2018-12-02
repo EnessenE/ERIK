@@ -144,7 +144,7 @@ module.exports = {
             var guild_info = `**Nickname**: ${(servermember.nickname || `None`)} \n` +
                 `**Joined this guild on**: ${servermember.joinedAt} \n` +
                 `**Strongest role**: ${servermember.highestRole.name} \n` +
-                `**Server muted**: ${servermember.serverMute} \n` +
+                `**Server muted**: ${servermember.serverMute ? "Yes" : "No"} \n` +
                 `**Roles**: ${roles}`;
 
             const embed = new RichEmbed();
@@ -207,7 +207,8 @@ module.exports = {
 
             if (repo != null) {
                 prefix = await repo.GetPrefix(message.guild.id);
-                botcontrol = await repo.GetValue(message.guild.id, "PermRole");
+                //botcontrol = await repo.GetValue(message.guild.id, "PermRole");
+                botcontrol = -1;
             }
             else {
                 botcontrol = -1;
