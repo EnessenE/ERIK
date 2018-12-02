@@ -69,7 +69,7 @@ async function createServer(id, servername, members, prefix, owner, ownerid, reg
 
         request.input('id', sql.NVarChar(sql.MAX), id);
         request.input('name', sql.NVarChar(sql.MAX), servername);
-        request.input('members', sql.Int, members);
+        request.input('members', sql.NVarChar(sql.MAX), members);
         request.input('prefix', sql.NVarChar(5), prefix);
         request.input('ownerid', sql.NVarChar(sql.MAX), ownerid);
         request.input('owner', sql.NVarChar(sql.MAX), owner);
@@ -131,6 +131,7 @@ async function getPrefix(serverid) {
                 print(result.output) // key/value collection of output values
                 print(result.rowsAffected) // array of numbers, each number represents the number of rows affected by executed statemens
                 result = result.recordsets[0];
+                print("Success")
             }
             else {
                 print("Didn't recieve a result");
