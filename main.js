@@ -136,13 +136,14 @@ async function messageEvent(message) {
                 if (message.guild.available) {
                     const user = message.author;
 
-                    var serverdata = null;//await repo.GetServer(await message.guild.id);
+                    var serverdata = await repo.GetServer(await message.guild.id);
 
                     if (serverdata === null) {//id,servername,members,prefix,owner
                         //var result = await repo.CreateServer(message);
-                        //print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.ownerID, message.guild.region), true);
+                        print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.owner.user.tag, message.guild.ownerID, message.guild.region), true);
                     }
                     else {
+                        print("Exists, have to update")
                         //TODO: apply cashing here
                         //repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
                     }

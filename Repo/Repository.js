@@ -3,8 +3,12 @@ const db = require("../Context/" + config.sql.type + ".js");
 
 
 module.exports = {
-    CreateServer: async function (id, servername, members, prefix, owner, region) {
-        return await db.CreateServer(id, servername, members, prefix, owner, region);
+    GetServer: async function (serverid) {
+        return await db.getServer(serverid);
+    },
+
+    CreateServer: async function (id, servername, members, prefix, owner, ownerid, region) {
+        return await db.createServer(id, servername, members, prefix, owner, ownerid, region);
     },
 
     UpdateServer: async function (serverid, servername, members, owner, region) {
@@ -19,7 +23,7 @@ module.exports = {
     },
 
     GetPrefix: async function (serverid) {
-        return await db.GetPrefix(serverid);
+        return await db.getPrefix(serverid);
     },
 
     SetPrefix: async function (serverid, prefix) {
