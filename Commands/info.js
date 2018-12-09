@@ -182,12 +182,7 @@ module.exports = {
 
             var data = new RichEmbed();
 
-            data.title = `Server information for ${message.guild.name}`;
-
             data.color = 3447003;
-            data.thumbnail = message.guild.iconURL;
-            data.timestamp = new Date();
-            data.url = config.info.link;
 
             var generic = `**ID:** ${message.guild.id} \n` +
                 `**Members:** ${message.guild.memberCount} \n` +
@@ -198,11 +193,12 @@ module.exports = {
                 `**AFK timeout:** ${message.guild.afkTimeout / 60} minute(s) \n` +
                 `**Icon:** ${icon}\n`;
 
+            data.setAuthor(`Server information for ${message.guild.name}`, message.guild.iconURL);
             data.addField(`Generic`, generic, false);
 
             data.addField(`Roles`, getAllRoles(message), false);
 
-            var prefix = "Not able to retrieve prefix for this server.";
+            var prefix = "";
             var botcontrol = 0;
 
             if (repo != null) {
@@ -222,6 +218,9 @@ module.exports = {
                 permissionrole += "Not able to retrieve a role from the database";
             }
 
+            if (prefix == null) {
+                prefix = "Not able to retrieve a prefix for this server. Default prefix is being used.";
+            }
             var settings = `**Prefix:** ${prefix} \n` + permissionrole;
 
             data.addField(`Server specific bot configuration`, settings, false);
