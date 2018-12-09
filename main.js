@@ -144,7 +144,7 @@ async function messageEvent(message) {
                     }
                     else {
                         print("Exists, have to update")
-                        //TODO: apply cashing here
+                        //TODO: apply cache-ing here
                         //repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
                     }
                     if (user.tag !== client.user.tag) {
