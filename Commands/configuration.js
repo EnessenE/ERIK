@@ -7,26 +7,27 @@ module.exports = {
         config = c;
     },
 
-    setprefix: async function (client, message, parameters) {
-        if (parameters.length !== 0) {
-            //prefixset[message.guild.id] = parameters[0];
-            if (repo != null) {
-                var result = await repo.SetPrefix(message.guild.id, parameters[0]);
-                if (result != null) {
-                    message.reply("Changed the prefix from " + prefix + " to " + result + ".");
+    setprefix: async function (client, prefix, message, parameters) {
+        if (repo != null) {
+            if (parameters.length !== 0) {
+                //prefixset[message.guild.id] = parameters[0];
+                if (repo != null) {
+                    var result = await repo.SetPrefix(message.guild.id, parameters[0]);
+                    if (result != null && result == true) {
+                        message.reply(`Changed the prefix from ${prefix} to ${parameters[0]}`);
+                    }
+                    else {
+                        message.reply("I wasn't able to set the prefix. No changes were made.");
+                    }
                 }
                 else {
-                    message.reply("I wasn't able to set the prefix. No changes were made.");
+                    message.reply("I wasn't able to set the prefix. No database connection is available. No changes were made.");
                 }
             }
             else {
-                message.reply("I wasn't able to set the prefix. No database connection is available. No changes were made.");
+                message.reply("You need to define what prefix you want.");
             }
         }
-        else {
-            message.reply("You need to define what prefix you want.");
-        }
-
     },
 
     setbotcontrol: async function (message, parameters) {

@@ -189,7 +189,7 @@ function commandLogic(prefix, role_id, message, command, parameters) {
         infocommands.botinfo(client, message);
     }
     else if (command === "prefix") {
-        configcommands.setprefix(client, message, parameters);
+        configcommands.setprefix(client, prefix, message, parameters);
     }
     else if (command === "serverinfo") {
         infocommands.serverinfo(client, message);

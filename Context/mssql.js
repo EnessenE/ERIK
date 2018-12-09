@@ -60,6 +60,11 @@ async function getServer(serverid) {
     return result;
 }
 
+
+async function updateServer() {
+
+}
+
 async function createServer(id, servername, members, prefix, owner, ownerid, region) {
     return new Promise(function (resolve, reject) {
         print("Creating server for " + servername);
@@ -96,12 +101,26 @@ async function createServer(id, servername, members, prefix, owner, ownerid, reg
     });
 }
 
-async function updateServer() {
-
-}
-
-async function setPrefix() {
-
+async function setPrefix(id, prefix) {
+    return new Promise(function (resolve, reject) {
+        try {
+            const request = new sql.Request(pool);
+            request.input('id', sql.NVarChar(sql.MAX), id);
+            request.input('prefix',  prefix);
+            request.execute('updatePrefix', (err, result) => {
+                if (err) {
+                    print("Error while getting prefix: " + err, true);
+                    resolve(false)
+                }
+                resolve(true);
+            });
+        }
+        catch (error) {
+            print("failed at getting prefix");
+            print(error);
+            resolve(false);
+        }
+    });
 }
 
 async function getPrefix(serverid) {
@@ -138,6 +157,10 @@ async function getPrefix(serverid) {
 module.exports = {
     getPrefix: async function (serverid) {
         return await getPrefix(serverid);
+    },
+
+    setPrefix: async function (serverid, prefix) {
+        return await setPrefix(serverid, prefix);
     },
 
     getServer: async function (serverid) {
