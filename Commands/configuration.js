@@ -12,9 +12,10 @@ module.exports = {
             if (parameters.length !== 0) {
                 //prefixset[message.guild.id] = parameters[0];
                 if (repo != null) {
-                    var result = await repo.SetPrefix(message.guild.id, parameters[0]);
+                    var futureprefix = parameters[0].charAt(0);
+                    var result = await repo.SetPrefix(message.guild.id, futureprefix);
                     if (result != null && result == true) {
-                        message.reply(`Changed the prefix from ${prefix} to ${parameters[0]}`);
+                        message.reply(`Changed the prefix from ${prefix} to ${futureprefix}`);
                     }
                     else {
                         message.reply("I wasn't able to set the prefix. No changes were made.");
