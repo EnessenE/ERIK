@@ -80,7 +80,7 @@ function initialize_misc() {
     async function GetAdmins() {
         return new Promise(function (resolve, reject) {
             config.settings.admins.forEach(async function (id) {
-                var x = await client.fetchUser(id.toString());
+                var x = await client.fetchUser(id);
                 admins.push(x);
             });
             resolve(admins);
