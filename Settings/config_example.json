@@ -12,19 +12,24 @@
     "description": "",
     "github": "https://github.com/EnessenE/wora",
     "link": "",
-    "legacylink": ""
+    "status": [ "Testing", "Desting" ]
   },
 
   "settings": {
-    "specialguilds": [],
-    "admins": [ "" ]
+    "specialguilds": [], 
+    "admins": [ "" ] //Make sure this is a string array otherwise discord will be unhappy.
   },
 
 
-  "SQL": {
-    "SQLHost": "",
-    "SQLDatabase": "",
-    "SQLUsername": "",
-    "SQLPassword": ""
+  "sql": {
+    "type": "",
+    "host": "",
+    "database": "",
+    "username": "",
+    "password": ""
+  },
+
+  "costum": {
+    "debugging": true
   }
 }
