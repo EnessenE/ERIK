@@ -27,6 +27,7 @@
     <Content Include="Context\mssql.js" />
     <Content Include="Context\mysql.js" />
     <Content Include="Repo\Repository.js" />
+    <Content Include="Settings\config.json" />
     <Content Include="Settings\config_example.json" />
   </ItemGroup>
   <ItemGroup>
