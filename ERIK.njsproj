@@ -33,6 +33,7 @@
   <ItemGroup>
     <Folder Include="Commands" />
     <Folder Include="Context" />
+    <Folder Include="Models\" />
     <Folder Include="Repo" />
     <Folder Include="Settings" />
   </ItemGroup>
