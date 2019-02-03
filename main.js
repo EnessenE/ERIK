@@ -147,8 +147,9 @@ async function messageEvent(message) {
                         //TODO: apply cache-ing here
                         //repo.UpdateServer(message.guild.id, message.guild.name, message.guild.memberCount, await message.guild.ownerID, message.guild.region);
                     }
+
                     if (user.tag !== client.user.tag) {
-                        print("[" + message.guild.name + "]" + message.author.tag + " - " + message.content);
+                        print(`[${message.guild.name}]${message.author.tag} - ${message.content}`);
 
                         var messageParts = message.content.split(' ');
                         var input = messageParts[0].toLowerCase();
