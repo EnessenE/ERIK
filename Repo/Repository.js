@@ -37,5 +37,9 @@ module.exports = {
 
     SetPrefix: async function (serverid, prefix) {
         return await db.setPrefix(serverid, prefix);
+    },
+
+    getLeaveMessages: async function(serverid){
+        return true;
     }
 }

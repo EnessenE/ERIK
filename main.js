@@ -124,6 +124,26 @@ function initialize_main() {
     });
 
     client.on('message', msg => messageEvent(msg));
+
+    client.on("guildMemberAdd", member => memberJoined(member));
+
+    client.on("guildMemberRemove", member => memberLeft(member));
+}
+
+async function memberJoined(member) {
+    print(`${member.user.username} has joined ${member.guild.name}`)
+}
+
+async function memberLeft(member) {
+    print(`${member.user.username} has left ${member.guild.name}`)
+    if (repo.getLeaveMessages()) {
+        member.guild.channels.forEach(function (element) {
+            if (element.name == "general") {
+                element.send(`<@${member.user.id}> has left this server. Wave goodbye.`);
+            }
+        });
+        //TODO: Cache the userid that has left incase he rejoins so we can reassign roles.
+    }
 }
 
 async function messageEvent(message) {
