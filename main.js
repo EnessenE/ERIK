@@ -108,9 +108,7 @@ function initialize_misc() {
         randomStatus();
     });
 
-    client.on('guildCreate', async guild => {
-        SendToAdmin(`Connected to a discord: ${guild.name} - ${guild.memberCount} members`);
-    });
+    client.on('guildCreate', async guild => joinedGuild(guild));
 
     client.on('guildDelete', async guild => {
         SendToAdmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount} members`);
@@ -144,6 +142,19 @@ async function memberLeft(member) {
         });
         //TODO: Cache the userid that has left incase he rejoins so we can reassign roles.
     }
+}
+
+function joinedGuild(guild){
+    const embed = new RichEmbed()
+    embed.setTitle("General information")
+    embed.setColor("#00a9ff")
+    embed.setDescription("This bot has joined a new guild");
+
+    embed.setThumbnail(guild.iconURL);
+    embed.addField("Name", guild.name);
+    embed.addField("Members", guild.memberCount);
+    embed.setTimestamp(new Date());
+    SendToAdmin(embed);
 }
 
 async function messageEvent(message) {
