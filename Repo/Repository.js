@@ -7,8 +7,8 @@ module.exports = {
         return await db.getServer(serverid);
     },
 
-    CreateServer: async function (id, servername, members, prefix, owner, ownerid, region) {
-        return await db.createServer(id, servername, members, prefix, owner, ownerid, region);
+    CreateServer: async function (id, servername, members, prefix, owner, ownerid, region, control) {
+        return await db.createServer(id, servername, members, prefix, owner, ownerid, region, control);
     },
 
     UpdateServer: async function (serverid, servername, members, owner, region) {
@@ -18,8 +18,17 @@ module.exports = {
     GetValue: async function (id, valuetocheck) {
         return await db.GetValue(id, valuetocheck);
     },
+
     UpdateValue: async function (serverid, valuetoupdate, newvalue) {
         return await db.UpdateValue(serverid, valuetoupdate, newvalue);
+    },
+
+    GetControl: async function (serverid) {
+        return await db.getControl(serverid);
+    },
+
+    UpdateControl: async function (serverid, newvalue) {
+        return await db.updateControl(serverid, newvalue);
     },
 
     GetPrefix: async function (serverid) {

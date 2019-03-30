@@ -26,7 +26,7 @@ var contacts;
 function randomStatus() {
     var random = Math.floor(Math.random() * config.info.status.length) + 0;
     var status = config.info.status[random];
-    client.user.setActivity(`${ status }`);
+    client.user.setActivity(`${status}`);
 }
 
 async function SendToAdmin(message) {
@@ -40,11 +40,11 @@ async function SendToAdmin(message) {
 
 function sendErrorToAdmin(header, text, message) {
     const embed = new RichEmbed();
-        // Set the title of the field
+    // Set the title of the field
     embed.setTitle(header);
-        // Set the color of the embed
+    // Set the color of the embed
     embed.setColor(0xFF0000);
-        // Set the main content of the embed
+    // Set the main content of the embed
 
     embed.setDescription(text);
     // Send the embed to the same channel as the message
@@ -90,11 +90,11 @@ function initialize_misc() {
     client.on('ready', async () => {
         await GetAdmins();
         const embed = new RichEmbed()
-            // Set the title of the field
+        // Set the title of the field
         embed.setTitle("Startup information")
-            // Set the color of the embed
+        // Set the color of the embed
         embed.setColor("#00a9ff")
-            // Set the main content of the embed
+        // Set the main content of the embed
         embed.setDescription("Bot information that was gathered when the bot was started");
 
         print(`Logged in as ${client.user.tag}!`, true);
@@ -138,9 +138,9 @@ async function messageEvent(message) {
 
                     var serverdata = await repo.GetServer(await message.guild.id);
 
-                    if (serverdata === null) {//id,servername,members,prefix,owner
-                        //var result = await repo.CreateServer(message);
-                        print("Creation of record: " + await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.owner.user.tag, message.guild.ownerID, message.guild.region), true);
+                    if (serverdata === null) {
+                        var result = await repo.CreateServer(message.guild.id, message.guild.name, message.guild.memberCount, config.default.prefix, message.guild.owner.user.tag, message.guild.ownerID, message.guild.region);
+                        print("Creation of record: " + result, true);
                     }
                     else {
                         print("Exists, have to update")
@@ -182,30 +182,46 @@ async function messageEvent(message) {
     }
 }
 
-function commandLogic(prefix, role_id, message, command, parameters) {
-    if (command === "ping") {
-        infocommands.ping(client, message);
+async function commandLogic(prefix, role_id, message, command, parameters) {
+    try {
+        if (command === "ping") {
+            infocommands.ping(client, message);
+        }
+        else if (command === "you" || command === "botinfo") {
+            infocommands.botinfo(client, message);
+        }
+        else if (command === "prefix") {
+            print(`${message.author.tag} has this permission: ${await hasPermission(message)}`);
+            if (await hasPermission(message)) {
+                configcommands.setprefix(client, prefix, message, parameters);
+            }
+            else {
+                message.reply(notallowed());
+            }
+        }
+        else if (command === "serverinfo") {
+            infocommands.serverinfo(client, message);
+        }
+        else if (command === "help" || command === "commands") {
+            infocommands.help(client, prefix, message, commands);
+        }
+        else if (command === "botcontrol") {
+            if (await hasPermission(message)) {
+                configcommands.setbotcontrol(message, parameters);
+            }
+            else {
+                message.reply(notallowed());
+            }
+        }
+        else if ((command === "userinfo") || (command === "me")) {
+            infocommands.userinfo(client, message, parameters);
+        }
+        else {
+            GuildSpecificCommands(message);
+        }
     }
-    else if (command === "you" || command === "botinfo") {
-        infocommands.botinfo(client, message);
-    }
-    else if (command === "prefix") {
-        configcommands.setprefix(client, prefix, message, parameters);
-    }
-    else if (command === "serverinfo") {
-        infocommands.serverinfo(client, message);
-    }
-    else if (command === "help" || command ==="commands") {
-        infocommands.help(client, prefix, message, commands);
-    }
-    else if (command === "botcontrol") {
-        configcommands.setbotcontrol(message, parameters);
-    }
-    else if ((command === "userinfo") || (command === "me")) {
-        infocommands.userinfo(client, message, parameters);
-    }
-    else {
-        GuildSpecificCommands(message);
+    catch (error) {
+        throw error;
     }
 }
 
@@ -218,23 +234,28 @@ function GuildSpecificCommands(message) {
     }
 }
 
-function notallowed(command, id) {
-    return "You are not allowed to use the " + prefix + command + " command.";
+function notallowed() {
+    return "you are not allowed to use that command.";
 }
 
-function PermCheck(message, user, roleid) {
+async function hasPermission(message) {
     var val = false;
-    return new Promise(function (resolve, reject) {
-        roletarget = parseInt(roleid);
-        message.member.roles.forEach(function (element) {
-            if (roletarget == parseInt(element.id)) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            roletarget = parseInt(await repo.GetControl(message.guild.id));
+            message.member.roles.forEach(function (element) {
+                if (roletarget == parseInt(element.id)) {
+                    val = true;
+                }
+            });
+            if (message.member.hasPermission("ADMINISTRATOR")) {
                 val = true;
             }
-        });
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-            val = true;
+            resolve(val);
         }
-        resolve(val);
+        catch (error) {
+            resolve(false);
+        }
     });
 }
 
@@ -247,22 +268,6 @@ function IsAdmin(id) {
             }
         });
         resolve(false);
-    });
-}
-
-function hasPermission(message, user, roleid) {
-    var val = false;
-    return new Promise(function (resolve, reject) {
-        roletarget = parseInt(roleid);
-        message.member.roles.forEach(function (element) {
-            if (roletarget == parseInt(element.id)) {
-                val = true;
-            }
-        });
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-            val = true;
-        }
-        resolve(val);
     });
 }
 

@@ -51,7 +51,7 @@ module.exports = {
                     }
                 });
                 if (found == true) {
-                    if (await repo.UpdateValue(message.guild.id, "PermRole", roleid)) {
+                    if (await repo.UpdateControl(message.guild.id, roleid)) {
                         message.reply("I have set the role " + rolename + " to control me.");
                     }
                     else {
