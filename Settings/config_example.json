@@ -17,7 +17,7 @@
 
   "settings": {
     "specialguilds": [], 
-    "admins": [ "" ] //Make sure this is a string array otherwise discord will be unhappy.
+    "admins": [ "" ]
   },
 
 
