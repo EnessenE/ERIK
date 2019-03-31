@@ -158,6 +158,9 @@ function flipmyChar(c) { //Its gets the job done.
     else if (c == '?') {
         return '¿'
     }
+    else if (c == '¿') {
+        return '?'
+    }
     else if (c == '!') {
         return 'i'
     }
