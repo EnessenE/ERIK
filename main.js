@@ -122,7 +122,9 @@ function initialize_misc() {
 
 function timeCode(){
     print("Time code is executing");
-    randomStatus();
+    if (Math.floor(Math.random()*10) == 1){
+        randomStatus();
+    }
     time.timeCode(client);
 }
 
