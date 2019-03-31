@@ -57,7 +57,5 @@ module.exports = {
         if (endTime == 1554206400) {
             aprilFools(client);
         }
-        aprilFools(client);
-
     }
 }
