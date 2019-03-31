@@ -50,6 +50,8 @@ module.exports = {
 
         print("Time logic is being executed.");
         print(`Time in unix: ${currentTime}. Checking start ${startTime} and end ${endTime}`);
+        print(`${startTime} vs 1554076800`)
+        print(`${endTime} vs 1554206400`)
 
         if (startTime == 1554076800) { //Hardcoded check = bad
             aprilFools(client);
