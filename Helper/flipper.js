@@ -194,13 +194,15 @@ function flipmyChar(c) { //Its gets the job done.
 function reverse(s) {
     for (var i = s.length - 1, o = ''; i >= 0; o += s[i--]) { }
     return o;
-  }
+}
 
 function flipmyString(aString) {
-    var last = aString.length - 1;
     var result = "";
-    for (var i = last; i >= 0; --i) {
-        result += flipmyChar(aString.charAt(i))
+    if (aString != undefined && aString != "") {
+        var last = aString.length - 1;
+        for (var i = last; i >= 0; --i) {
+            result += flipmyChar(aString.charAt(i))
+        }
     }
     return result;
 }
