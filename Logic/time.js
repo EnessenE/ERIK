@@ -50,6 +50,18 @@ function aprilFools(client) {
                 }
 
             });
+
+            guild.roles.forEach(function (element) {
+                try {
+                    sleep(250);
+                    print("Current turn of role: " + element.name)
+                    element.setName(flipper.flipmyString(element.name), "A great april fools joke in 2019");
+                }
+                catch (error) {
+                    print("Failed changing name of " + member.displayName + ": " + error);
+                }
+            });
+
         }
     });
 }
