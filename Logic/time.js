@@ -19,6 +19,9 @@ function aprilFools(client) {
             guild.channels.forEach(function (element) {
                 print("Current turn of channel: " + element.name)
                 element.setName(flipper.flipmyString(element.name), "A great april fools joke in 2019");
+                if (element.type == "text") {
+                    element.setTopic(flipper.flipmyString(element.topic), "A great april fools joke in 2019");
+                }
             });
 
             guild.members.forEach(member => {
