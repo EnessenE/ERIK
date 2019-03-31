@@ -1,7 +1,7 @@
 var repo;
 var config;
 const flipper = require("../Helper/flipper.js");
-var aprilfools = false;
+var aprilfools = true;
 
 function print(message, override) {
     if (config.costum.debugging || override) {
@@ -9,15 +9,24 @@ function print(message, override) {
     }
 }
 
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds) {
+            break;
+        }
+    }
+}
+
 function aprilFools(client) {
     print("Happy april fools");
-    client.guilds.get("the guild id");
     config.settings.specialguilds.forEach(async function (element) {
         print("Looking for: " + element);
         var guild = client.guilds.get(element);
         if (guild.name != undefined) {
             print("Found: " + guild.name)
             guild.channels.forEach(function (element) {
+                sleep(250);
                 print("Current turn of channel: " + element.name)
                 element.setName(flipper.flipmyString(element.name), "A great april fools joke in 2019");
                 if (element.type == "text") {
@@ -26,9 +35,15 @@ function aprilFools(client) {
             });
 
             guild.members.forEach(member => {
+                sleep(250);
                 try {
-                    print(`Finding member: ${member.displayName} of ${guild.name}`)
-                    member.setNickname(flipper.flipmyString(member.displayName), "A great april fools joke in 2019");
+                    if (!member.hasPermission("ADMINISTRATOR")) {
+                        print(`Finding member: ${member.displayName} of ${guild.name}`)
+                        member.setNickname(flipper.flipmyString(member.displayName), "A great april fools joke in 2019");
+                    }
+                    else {
+                        print("NOT DOING: " + member.displayName);
+                    }
                 }
                 catch (error) {
                     print("Failed changing name of " + member.displayName + ": " + error);
@@ -57,7 +72,7 @@ module.exports = {
         print(`${startTime} vs 1554076800`)
         print(`${endTime} vs 1554206400`)
 
-        if (startTime == 1554076800 && !aprilfools) { //Hardcoded check = bad
+        if (!aprilfools) { //Hardcoded check = bad
             aprilfools = true;
             aprilFools(client);
         }
