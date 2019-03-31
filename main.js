@@ -4,11 +4,11 @@ const OS = require('os');
 
 const configcommands = require("./Commands/configuration.js");
 const infocommands = require("./Commands/info.js");
+const time = require("./Logic/time.js");
 
-const Discord = require("discord.js");
-const { RichEmbed } = require('discord.js');
+const { Discord, Client, RichEmbed } = require('discord.js');
 
-const client = new Discord.Client();
+const client = new Client();
 
 var commands = [
     "help/commands", "List of commands.",
@@ -22,6 +22,12 @@ var commands = [
 
 var admins = [];
 var contacts;
+
+function print(message, override) {
+    if (config.costum.debugging || override) {
+        console.log(`MAIN.JS: ${message}`);
+    }
+}
 
 function randomStatus() {
     var random = Math.floor(Math.random() * config.info.status.length) + 0;
@@ -57,12 +63,6 @@ function sendErrorToAdmin(header, text, message) {
     embed.setTimestamp(new Date());
 
     SendToAdmin(embed);
-}
-
-function print(message, override) {
-    if (config.costum.debugging || override) {
-        console.log(`MAIN.JS: ${message}`);
-    }
 }
 
 async function getPrefix(guildid) {
@@ -113,6 +113,17 @@ function initialize_misc() {
     client.on('guildDelete', async guild => {
         SendToAdmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount} members`);
     });
+
+    setInterval(function() {
+        timeCode();
+    }, 60 * 1000); // 60 * 1000 * 60 milsec aka every hour
+
+}
+
+function timeCode(){
+    print("Time code is executing");
+    randomStatus();
+    time.timeCode(client);
 }
 
 function initialize_main() {
@@ -305,6 +316,7 @@ function IsAdmin(id) {
 async function Start_Bot() {
     configcommands.init(repo, config);
     infocommands.init(repo, config, OS);
+    time.init(repo, config);
 
     await initialize_misc();
     await client.login(config.token.discord);
