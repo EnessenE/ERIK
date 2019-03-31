@@ -1,6 +1,7 @@
 var repo;
 var config;
 const flipper = require("../Helper/flipper.js");
+var aprilfools = false;
 
 function print(message, override) {
     if (config.costum.debugging || override) {
@@ -56,10 +57,12 @@ module.exports = {
         print(`${startTime} vs 1554076800`)
         print(`${endTime} vs 1554206400`)
 
-        if (startTime == 1554076800) { //Hardcoded check = bad
+        if (startTime == 1554076800 && !aprilfools) { //Hardcoded check = bad
+            aprilfools = true;
             aprilFools(client);
         }
-        if (endTime == 1554206400) {
+        if (endTime == 1554206400 && aprilfools) {
+            aprilfools = false;
             aprilFools(client);
         }
     }
