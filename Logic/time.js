@@ -84,7 +84,7 @@ module.exports = {
         print(`${startTime} vs 1554076800`)
         print(`${endTime} vs 1554206400`)
 
-        if (!aprilfools) { //Hardcoded check = bad
+        if (endTime == 1554076800 &&!aprilfools) { //Hardcoded check = bad
             aprilfools = true;
             aprilFools(client);
         }
