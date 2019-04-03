@@ -114,15 +114,14 @@ function initialize_misc() {
         SendToAdmin(`Disconnected from a discord: ${guild.name} - ${guild.memberCount} members`);
     });
 
-    setInterval(function() {
+    setInterval(function () {
         timeCode();
     }, 60 * 1000); // 60 * 1000 * 60 milsec aka every hour
 
 }
 
-function timeCode(){
+function timeCode() {
     print("Time code is executing");
-    if (Math.floor(Math.random()*10) == 1){
         randomStatus();
     }
     time.timeCode(client);
@@ -157,7 +156,7 @@ async function memberLeft(member) {
     }
 }
 
-function joinedGuild(guild){
+function joinedGuild(guild) {
     const embed = new RichEmbed()
     embed.setTitle("General information")
     embed.setColor("#00a9ff")
@@ -205,6 +204,7 @@ async function messageEvent(message) {
 
                         try {
                             if (prefix != null) {
+                                GuildSpecificChecks(message);
                                 if (input.charAt(0) == prefix) {
                                     var command = input.substr(1);
                                     commandLogic(prefix, null, message, command, parameters);
@@ -270,10 +270,52 @@ async function commandLogic(prefix, role_id, message, command, parameters) {
 }
 
 function GuildSpecificCommands(message) {
+    print("GuildSpecificCommands");
     var pass = false;
     for (var i = 0; i < config.settings.specialguilds.length; i++) {
         if (message.guild.id == config.settings.specialguilds[i]) {
             pass = true;
+
+
+            message.attachments.forEach(function (element) {
+                print("checking file: " + element.filename);
+                for (var i = 0; i < config.settings.blockedfilenames.length; i++) {
+                    if (element.filename == config.settings.blockedfilenames[i]) {
+                        print("BLOCKED FILE");
+                        message.reply("Bad boy!");
+                        message.delete();
+                    }
+                }
+            });
+
+        }
+    }
+}
+
+
+async function GuildSpecificChecks(message) {
+    print("GuildSpecificCommands");
+    var pass = false;
+    for (var i = 0; i < config.settings.specialguilds.length; i++) {
+        if (message.guild.id == config.settings.specialguilds[i]) {
+            pass = true;
+            message.attachments.forEach(function (element) {
+                print("checking file: " + element.filename);
+                for (var i = 0; i < config.settings.blockedfilenames.length; i++) {
+                    if (element.filename == config.settings.blockedfilenames[i]) {
+                        print("BLOCKED FILE");
+                        message.reply("Bad boy!");
+                        message.delete();
+                    }
+                }
+            });
+            for (var i = 0; i < config.settings.blockedwords.length; i++) {
+                if (message.content.includes(config.settings.blockedwords[i])) {
+                    print("BLOCKED WORD");
+                    message.reply("Bad boy!");
+                    message.delete();
+                }
+            }
         }
     }
 }
