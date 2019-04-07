@@ -143,7 +143,7 @@ function initialize_main() {
     client.on("error", info => clientError(info));
 }
 
-function clienterror(error) {
+function clientError(error) {
     console.log('Error event:\n' + JSON.stringify(error));
     // handle the error here
 }
