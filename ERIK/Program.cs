@@ -1,7 +1,8 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
+using ERIK.Handlers;
 using ERIK.Helpers;
-using System;
 using System.Threading.Tasks;
 
 namespace ERIK
@@ -9,6 +10,8 @@ namespace ERIK
     class Program
     {
         protected DiscordSocketClient _client;
+        protected CommandService commandService;
+        protected CommandHandler commandHandler;
 
         internal static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
@@ -26,20 +29,15 @@ namespace ERIK
             await _client.LoginAsync(TokenType.Bot, DiscordToken);
             await _client.StartAsync();
 
+            commandService = new CommandService();
+            commandHandler = new CommandHandler(_client, commandService);
+
+            await commandHandler.InstallCommandsAsync();
+
+
             //Events
-            _client.MessageReceived += MessageReceived;
 
             await Task.Delay(-1);
         }
-
-        private async Task MessageReceived(SocketMessage message)
-        {
-            if (message.Content == "!ping")
-            {
-                await message.Channel.SendMessageAsync("Pong!");
-            }
-        }
-
-
     }
 }
